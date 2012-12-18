@@ -1,7 +1,6 @@
 function make_figures_fneval_2(epsilon,LeapSize,beta)
 			clc;
 			close all;
-			clear;
 			opts = [];
 			% the energy function and gradient for the circle distribution in the arXiv
 			% TODO: I think I should have used a very long narrow Gaussian instead!
@@ -132,5 +131,9 @@ function make_figures_fneval_2(epsilon,LeapSize,beta)
 	% batch_2d_plot(Xstandard);
 	savestr = strcat('LeapSize',int2str(LeapSize),'Epsilon',int2str(epsilon),'Beta',int2str(beta));
 	savepath = strcat('/clusterfs/cortex/scratch/mayur/HMC_reducedflip/',savestr);
+    figpath1 = strcat('/clusterfs/cortex/scratch/mayur/HMC_reducedflip/figures/','h1');
+    figpath2 = strcat('/clusterfs/cortex/scratch/mayur/HMC_reducedflip/figures/','h2');
+    saveas(h1,figpath1,'eps');
+    saveas(h2,figpath2,'eps');
 	save(savepath);
 end
