@@ -1,4 +1,4 @@
-function make_figures_fneval_2(epsilon,LeapSize,beta)
+function make_figures_fneval_2(LeapSize,epsilon,beta)
 			clc;
 			close all;
 			opts = [];
@@ -11,27 +11,29 @@ function make_figures_fneval_2(epsilon,LeapSize,beta)
 			% make this 1 for more output
 			opts.Debug = 0;
 			% step size for HMC
-			if 1 %nargin<1
-					opts.epsilon = 1.2;
-			else
-					opts.epsilon = epsilon;
-			end
-			opts.beta = beta;
-
-			% number of times to call the sampler
-			Nsamp = 2000;
-			% number of sampling steps to take in each sampler call
-			opts.T = 1;
-			opts.BatchSize = 1;
-			% number of data dimensions
-			opts.DataSize = 2;
-			if 1 %nargin<2
+            if nargin<1
 					opts.LeapSize = 1;
 			else
 					opts.LeapSize = LeapSize;
 			end
-			opts.beta = 0.2;
-			opts.skew_dims = 2;
+			if nargin<2
+					opts.epsilon = 1.2;
+			else
+					opts.epsilon = epsilon;
+            end
+            if nargin<3
+                opts.beta = .03;
+            else
+                opts.beta = beta;
+            end            
+
+			% number of times to call the sampler
+			Nsamp = 10000;
+			% number of sampling steps to take in each sampler call
+% 			opts.T = 1;
+			opts.BatchSize = 1;
+			% number of data dimensions
+			opts.DataSize = 2;						
 
 			% scaling factor for energy function
 			theta = [1,0;0,1e-5];
@@ -87,7 +89,7 @@ function make_figures_fneval_2(epsilon,LeapSize,beta)
 					else
 							Xstandard_persist = cat(3,Xstandard_persist, Xs);
 					end
-					fevalsstandard_persist(ii) = statestandard_persist.steps.total;
+% 					fevalsstandard_persist(ii) = statestandard_persist.steps.total;
 					fevalsstandard_persist(ii,1) = statestandard_persist.funcevals;
 					fevalsstandard_persist(ii,2) = calc_samples_err(Xstandard_persist,theta);       
 
@@ -98,7 +100,7 @@ function make_figures_fneval_2(epsilon,LeapSize,beta)
 					else
 							Xreduced_flip = cat(3,Xreduced_flip, Xs);
 					end
-					fevalsreduced_flip(ii) = statereduced_flip.steps.total;
+% 					fevalsreduced_flip(ii) = statereduced_flip.steps.total;
 					fevalsreduced_flip(ii,1) = statereduced_flip.funcevals;
 					fevalsreduced_flip(ii,2) = calc_samples_err(Xreduced_flip,theta);
 
@@ -121,10 +123,15 @@ function make_figures_fneval_2(epsilon,LeapSize,beta)
 			%% and now a bunch of code to display the results    
 	sprintf('\n');
 	% print out some info
-	statestandard
-	statestandard_persist
-	statereduced_flip
-	state_2_momentum
+% 	statestandard
+% 	statestandard_persist
+% 	statereduced_flip
+% 	state_2_momentum
+
+    fevalsstandard(end,:)
+    fevalsstandard_persist(end,:)
+    fevalsreduced_flip(end,:)
+    feval_2_momentum(end,:)
 
 	h1=plot_autocorr_samples(Xstandard,Xstandard_persist,Xreduced_flip,X_2_momentum);
 	h2=plot_fevals(fevalsstandard,fevalsstandard_persist,fevalsreduced_flip,feval_2_momentum);
