@@ -11,7 +11,7 @@ function make_figures_fneval_2(LeapSize,epsilon,beta)
 			% make this 1 for more output
 			opts.Debug = 0;
 			% step size for HMC
-            if nargin<1
+			if nargin<1
 					opts.LeapSize = 1;
 			else
 					opts.LeapSize = LeapSize;
@@ -20,12 +20,12 @@ function make_figures_fneval_2(LeapSize,epsilon,beta)
 					opts.epsilon = 1.2;
 			else
 					opts.epsilon = epsilon;
-            end
-            if nargin<3
-                opts.beta = .03;
-            else
-                opts.beta = beta;
-            end            
+			end
+			if nargin<3
+					opts.beta = .03;
+			else
+					opts.beta = beta;
+			end            
 
 			% number of times to call the sampler
 			Nsamp = 10000;
@@ -122,16 +122,10 @@ function make_figures_fneval_2(LeapSize,epsilon,beta)
 
 			%% and now a bunch of code to display the results    
 	sprintf('\n');
-	% print out some info
-% 	statestandard
-% 	statestandard_persist
-% 	statereduced_flip
-% 	state_2_momentum
-
-    fevalsstandard(end,:)
-    fevalsstandard_persist(end,:)
-    fevalsreduced_flip(end,:)
-    feval_2_momentum(end,:)
+	fevalsstandard(end,:)
+	fevalsstandard_persist(end,:)
+	fevalsreduced_flip(end,:)
+	feval_2_momentum(end,:)
 
 	h1=plot_autocorr_samples(Xstandard,Xstandard_persist,Xreduced_flip,X_2_momentum);
 	h2=plot_fevals(fevalsstandard,fevalsstandard_persist,fevalsreduced_flip,feval_2_momentum);
