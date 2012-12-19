@@ -129,11 +129,11 @@ function make_figures_fneval_2(epsilon,LeapSize,beta)
 	h1=plot_autocorr_samples(Xstandard,Xstandard_persist,Xreduced_flip,X_2_momentum);
 	h2=plot_fevals(fevalsstandard,fevalsstandard_persist,fevalsreduced_flip,feval_2_momentum);
 	% batch_2d_plot(Xstandard);
-	savestr = strcat('LeapSize',int2str(LeapSize),'Epsilon',int2str(epsilon),'Beta',int2str(beta));
+	savestr = strcat('LeapSize-',int2str(LeapSize),'Epsilon-',int2str(epsilon*10),'Beta-',int2str(beta*100));
 	savepath = strcat('/clusterfs/cortex/scratch/mayur/HMC_reducedflip/',savestr);
-    figpath1 = strcat('/clusterfs/cortex/scratch/mayur/HMC_reducedflip/figures/','h1');
-    figpath2 = strcat('/clusterfs/cortex/scratch/mayur/HMC_reducedflip/figures/','h2');
-    saveas(h1,figpath1,'eps');
-    saveas(h2,figpath2,'eps');
+	figpath1 = strcat('/clusterfs/cortex/scratch/mayur/HMC_reducedflip/figures/',savestr,'autocor');
+	figpath2 = strcat('/clusterfs/cortex/scratch/mayur/HMC_reducedflip/figures/',savestr,'fneval');
+	saveas(h1,figpath1,'eps');
+	saveas(h2,figpath2,'eps');
 	save(savepath);
 end
