@@ -8,6 +8,7 @@
 % opts contains options for the sampler
 
 function [X, state] = rf2vHMC( opts, state, varargin )
+varargin{:}
     
     % load parameters
     f_E = getField( opts, 'E', 0 );
@@ -69,7 +70,6 @@ function [X, state] = rf2vHMC( opts, state, varargin )
     end
 
     global funcevals_inc
-%     funcevals_inc = state.funcevals;
     funcevals_inc = 0;
     
     for t = 1:T % iterate over update steps

@@ -68,7 +68,6 @@ function make_figures_fneval_2(LeapSize,epsilon,beta)
 			ttt = tic();
 			% call the sampling algorithm Nsamp times
 			for ii = 1:Nsamp  
-
 					 % the standard sampler
 					[Xs, statestandard] = rf2vHMC( optsstandard, statestandard, theta );
 					if ii == 1
