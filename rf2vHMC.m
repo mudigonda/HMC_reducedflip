@@ -8,7 +8,6 @@
 % opts contains options for the sampler
 
 function [X, state] = rf2vHMC( opts, state, varargin )
-varargin{:}
     
     % load parameters
     f_E = getField( opts, 'E', 0 );
@@ -30,7 +29,7 @@ varargin{:}
     %1 is reduced flipping and 2 is 2 momentum variable
 
     
-    T = getField( opts, 'T', 1000 ); %%%T is not being defined in make_figures
+    T = getField( opts, 'T', 1 ); %%%T is not being defined in make_figures
     szb = getField( opts, 'BatchSize', 1 );
     %szb = 1; % for now, this is always 1...
     szd = getField( opts, 'DataSize', 10 );
@@ -41,11 +40,11 @@ varargin{:}
         % the random seed reset will make experiments exactly repeatable
         %reset(RandStream.getDefaultStream);
         state.X = randn( szd, szb );
-%         state.V1 = randn( szd, szb );
-        state.V1 = repmat(randn(szd,1),1,szb);
+        state.V1 = randn( szd, szb );
+%        state.V1 = repmat(randn(szd,1),1,szb);
         if flip_on_rej == 2
-%             state.V2 = randn(szd,szb);
-            state.V2 = repmat(randn(szd,1),1,szb);
+             state.V2 = randn(szd,szb);
+%            state.V2 = repmat(randn(szd,1),1,szb);
         end
         state.X(:) = 0;
         state.X(1,:) = 1;
@@ -172,7 +171,6 @@ varargin{:}
 
                     r_L_F = leap_prob(F_state,LF_state,flip_on_rej);
                     r_L_LinvF = leap_prob(LinvF_state,F_state,flip_on_rej);
-
                     %Lin prog constraints            
                     %lb and ub
                     lb = zeros(1,16); 
@@ -254,8 +252,8 @@ varargin{:}
         end
 
         % slightly randomize the momentum
-%         N1 = randn( szd, szb );      
-        N1 = repmat(randn(szd,1),1,szb);
+         N1 = randn( szd, szb );      
+%        N1 = repmat(randn(szd,1),1,szb);
         state.V1  = real(sqrt(1-beta)) * state.V1 + sqrt(beta) * N1; % numerical errors if beta == 1
 %         %maybe for v2
         if flip_on_rej == 2
