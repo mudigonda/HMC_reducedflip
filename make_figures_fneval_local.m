@@ -38,11 +38,11 @@ whos
 			opts.BatchSize = 100;
 			% number of data dimensions
 			opts.DataSize = 2;
-			opts.funcevals = 0
+% 			opts.funcevals = 0
 
 			% scaling factor for energy function
 			theta = [1,0;0,1e-3];
-			FEVAL_MAX = 20000
+			FEVAL_MAX = 250000
 
 			%Initalize Options
 			optsstandard = opts;
@@ -75,7 +75,7 @@ whos
 			% call the sampling algorithm Nsamp times
 			for ii = 1:Nsamp  
 					 % the standard sampler
-				tic()
+% 				tic()
 			if ii > 1
 				if statestandard.funcevals < FEVAL_MAX 
 						[Xs, statestandard] = rf2vHMC( optsstandard, statestandard, theta );
@@ -86,11 +86,11 @@ whos
 						[Xs, statestandard] = rf2vHMC( optsstandard, statestandard, theta );
 						Xstandard = Xs;
 			end
-				toc()
+% 				toc()
 					fevalsstandard(ii,1) = statestandard.funcevals;
 					fevalsstandard(ii,2) = calc_samples_err(Xstandard,theta);
 	% %         the standard sampler with persistent momentum
-				tic()
+% 				tic()
 				if ii > 1
 					if statestandard_persist.funcevals < FEVAL_MAX 
 						[Xs, statestandard_persist] = rf2vHMC( optsstandard_persist, statestandard_persist, theta );
@@ -101,12 +101,12 @@ whos
 						[Xs, statestandard_persist] = rf2vHMC( optsstandard_persist, statestandard_persist, theta );
 						Xstandard_persist = Xs;
 			 end
-				toc()
+% 				toc()
 						fevalsstandard_persist(ii,1) = statestandard_persist.funcevals;
 						fevalsstandard_persist(ii,2) = calc_samples_err(Xstandard_persist,theta);      
 
 	% %         the reduced flip sampler
-				tic()
+% 				tic()
 			if ii > 1
 				if statereduced_flip.funcevals < FEVAL_MAX 
 					[Xs, statereduced_flip] = rf2vHMC( optsreduced_flip, statereduced_flip, theta );
@@ -117,11 +117,11 @@ whos
 					[Xs, statereduced_flip] = rf2vHMC( optsreduced_flip, statereduced_flip, theta );
 					Xreduced_flip = Xs;
 			end
-				toc()
+% 				toc()
 				fevalsreduced_flip(ii,1) = statereduced_flip.funcevals;
 				fevalsreduced_flip(ii,2) = calc_samples_err(Xreduced_flip,theta);
 	% %         %the two momentum sampler
-				tic()
+% 				tic()
 				if ii > 1
 				 if state_2_momentum.funcevals < FEVAL_MAX 
 					[Xs, state_2_momentum] = rf2vHMC( opts_2_momentum, state_2_momentum,theta );
@@ -132,26 +132,17 @@ whos
 					[Xs, state_2_momentum] = rf2vHMC( opts_2_momentum, state_2_momentum,theta );
 					X_2_momentum = Xs;
 				end
-				toc()
+% 				toc()
 					feval_2_momentum(ii,1) = state_2_momentum.funcevals;
 					feval_2_momentum(ii,2) = calc_samples_err(X_2_momentum,theta);
 
 				%Display + Saving 
-					if mod( ii, 100 ) == 1
-							fprintf('%d / %d in %f sec (%f sec remaining)\n', ii, Nsamp, toc(ttt), toc(ttt)*Nsamp/ii - toc(ttt) );
-							h1=plot_autocorr_samples(Xstandard,Xstandard_persist,Xreduced_flip,X_2_momentum);
-							h2=plot_fevals(fevalsstandard,fevalsstandard_persist,fevalsreduced_flip,feval_2_momentum);
-							LeapSize
-							int2str(epsilon)
-							int2str(beta)
-							savestr = strcat('LeapSize-',int2str(LeapSize),'epsilon-',int2str(epsilon*10),'Beta-',int2str(beta*100));
-							savepath = strcat('/clusterfs/cortex/scratch/mayur/HMC_reducedflip/',savestr);
-							figpath1 = strcat('/clusterfs/cortex/scratch/mayur/HMC_reducedflip/figures/',savestr,'autocor');
-							figpath2 = strcat('/clusterfs/cortex/scratch/mayur/HMC_reducedflip/figures/',savestr,'fneval');
-							saveas(h1,figpath1,'pdf');
-							saveas(h2,figpath2,'pdf');
-							save(savepath);
-					end
+% % % 					if mod( ii, 100 ) == 1
+% % % 							fprintf('%d / %d in %f sec (%f sec remaining)\n', ii, Nsamp, toc(ttt), toc(ttt)*Nsamp/ii - toc(ttt) );
+% % % 							h1=plot_autocorr_samples(Xstandard,Xstandard_persist,Xreduced_flip,X_2_momentum);
+% % % 							h2=plot_fevals(fevalsstandard,fevalsstandard_persist,fevalsreduced_flip,feval_2_momentum);
+% % % 							save;
+% % % 					end
 			end
 			toc(ttt);
 
@@ -165,11 +156,5 @@ whos
 	h1=plot_autocorr_samples(Xstandard,Xstandard_persist,Xreduced_flip,X_2_momentum);
 	h2=plot_fevals(fevalsstandard,fevalsstandard_persist,fevalsreduced_flip,feval_2_momentum);
 	% batch_2d_plot(Xstandard);
-	savestr = strcat('LeapSize-',int2str(LeapSize),'epsilon-',int2str(epsilon*10),'Beta-',int2str(beta*100));
-	savepath = strcat('/clusterfs/cortex/scratch/mayur/HMC_reducedflip/',savestr);
-	figpath1 = strcat('/clusterfs/cortex/scratch/mayur/HMC_reducedflip/figures/',savestr,'autocor');
-	figpath2 = strcat('/clusterfs/cortex/scratch/mayur/HMC_reducedflip/figures/',savestr,'fneval');
-	saveas(h1,figpath1,'pdf');
-	saveas(h2,figpath2,'pdf');
-	save(savepath);
+	save;
 end
