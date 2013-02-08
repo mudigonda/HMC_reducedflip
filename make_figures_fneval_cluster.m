@@ -42,7 +42,7 @@ whos
 
 			% scaling factor for energy function
 			theta = [1,0;0,1e-3];
-			FEVAL_MAX = 20000
+			FEVAL_MAX = 250000
 
 			%Initalize Options
 			optsstandard = opts;
