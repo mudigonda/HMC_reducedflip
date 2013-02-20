@@ -113,8 +113,8 @@ function [X, state] = rf2vHMC( opts, state, varargin )
                     r_LF = leap_prob(F_state,LF_state,flip_on_rej);
                     r_F = r_LF - r_L;
                     r_F(r_F < 0) = 0;
-                    gd = (rnd_cmp < r_L + r_F);
-                    state.V1(:,gd) = -state.V1(:,gd);
+                    flip_ind = (rnd_cmp < r_L + r_F);                   
+                    state.V1(:,bd(flip_ind)) = -state.V1(:,bd(flip_ind));
                     if sum(gd) > 0
                         state.steps.flip = state.steps.flip +1;
                     else
@@ -227,24 +227,24 @@ function [X, state] = rf2vHMC( opts, state, varargin )
                         end
                     end
                     stay = (r_L < rnd_cmp & rnd_cmp < r_L+x(1));
-                    if sum(stay(:,bd))>0
+                    if sum(stay(:,bd(stay)))>0
                         state.steps.stay = state.steps.stay + 1;
     %                     break;
                     end                
                     flip = (r_L+x(1) < rnd_cmp & rnd_cmp < r_L+x(1)+x(2));
-                    if sum(flip(:,bd))>0
+                    if sum(flip(:,bd(flip)))>0
                         state.steps.flip = state.steps.flip +1;
                         state = flip_HMC(state,bd);
     %                     break;
                     end
                     swap = (r_L+x(1)+x(2) < rnd_cmp & rnd_cmp < r_L+x(1)+x(2)+x(3));
-                    if sum(swap(:,bd))>0
+                    if sum(swap(:,bd(swap)))>0
                         state.steps.swap = state.steps.swap + 1;
                         state = swap_HMC(state,bd);
     %                     break;
                     end
                     flipswap = (r_L+x(1)+x(2)+x(3) < rnd_cmp);
-                    if sum(flipswap(:,bd))>0
+                    if sum(flipswap(:,bd(flipswap)))>0
                         state.steps.flip_swap = state.steps.flip_swap + 1;
                         state = flip_swap_HMC(state,bd);
                     end
