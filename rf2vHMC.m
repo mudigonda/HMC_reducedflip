@@ -113,13 +113,11 @@ function [X, state] = rf2vHMC( opts, state, varargin )
                     r_LF = leap_prob(F_state,LF_state,flip_on_rej);
                     r_F = r_LF - r_L;
                     r_F(r_F < 0) = 0;
-                    flip_ind = (rnd_cmp < r_L + r_F);                   
-                    state.V1(:,bd(flip_ind)) = -state.V1(:,bd(flip_ind));
-                    if sum(gd) > 0
-                        state.steps.flip = state.steps.flip +1;
-                    else
-                        state.steps.stay = state.steps.stay + 1;
-                    end                    
+                    flip_ind = (rnd_cmp < r_L + r_F) & bd;                   
+                    state.V1(:,flip_ind) = -state.V1(:,flip_ind);
+                    state.steps.flip = state.steps.flip + sum(flip_ind);
+                    state.steps.stay = state.steps.stay + sum(~flip_ind);
+                    
                 %Jascha + Mayur - 2 momentum variable 
                 case 2
                     %we now have to calculate the 16 different probabilities
@@ -226,26 +224,26 @@ function [X, state] = rf2vHMC( opts, state, varargin )
                             disp('did not sum to 1')
                         end
                     end
-                    stay = (r_L < rnd_cmp & rnd_cmp < r_L+x(1));
-                    if sum(stay(:,bd(stay)))>0
-                        state.steps.stay = state.steps.stay + 1;
+                    stay = (r_L < rnd_cmp & rnd_cmp < r_L+x(1) & bd);
+                    if sum(stay)>0
+                        state.steps.stay = state.steps.stay + sum(stay);
     %                     break;
                     end                
-                    flip = (r_L+x(1) < rnd_cmp & rnd_cmp < r_L+x(1)+x(2));
-                    if sum(flip(:,bd(flip)))>0
-                        state.steps.flip = state.steps.flip +1;
+                    flip = (r_L+x(1) < rnd_cmp & rnd_cmp < r_L+x(1)+x(2) & bd);
+                    if sum(flip)>0
+                        state.steps.flip = state.steps.flip +sum(flip);
                         state = flip_HMC(state,bd);
     %                     break;
                     end
-                    swap = (r_L+x(1)+x(2) < rnd_cmp & rnd_cmp < r_L+x(1)+x(2)+x(3));
-                    if sum(swap(:,bd(swap)))>0
-                        state.steps.swap = state.steps.swap + 1;
+                    swap = (r_L+x(1)+x(2) < rnd_cmp & rnd_cmp < r_L+x(1)+x(2)+x(3) & bd);
+                    if sum(swap)>0
+                        state.steps.swap = state.steps.swap + sum(swap);
                         state = swap_HMC(state,bd);
     %                     break;
                     end
-                    flipswap = (r_L+x(1)+x(2)+x(3) < rnd_cmp);
-                    if sum(flipswap(:,bd(flipswap)))>0
-                        state.steps.flip_swap = state.steps.flip_swap + 1;
+                    flipswap = (r_L+x(1)+x(2)+x(3) < rnd_cmp & bd);
+                    if sum(flipswap)>0
+                        state.steps.flip_swap = state.steps.flip_swap + sum(flipswap);
                         state = flip_swap_HMC(state,bd);
                     end
             end
