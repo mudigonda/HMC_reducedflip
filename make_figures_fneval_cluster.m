@@ -53,6 +53,7 @@ opts{ii}.FlipOnReject = 0;
 opts{ii}.beta = 1;
 %Initialize States
 states{ii} = [];
+states{ii}.funcevals = 0;
 % arrays to keep track of the samples
 X{ii} = zeros(opts{ii}.DataSize,Nsamp);
 fevals{ii} = []
@@ -63,6 +64,7 @@ opts{ii} = opts_init;
 opts{ii}.FlipOnReject = 0;
 %Initialize States
 states{ii} = [];
+states{ii}.funcevals = 0;
 % arrays to keep track of the samples
 X{ii} = zeros(opts{ii}.DataSize,Nsamp);
 fevals{ii} = []
@@ -73,6 +75,7 @@ opts{ii} = opts_init;
 opts{ii}.FlipOnReject = 1;
 %Initialize States
 states{ii} = [];
+states{ii}.funcevals = 0;
 % arrays to keep track of the samples
 X{ii} = zeros(opts{ii}.DataSize,Nsamp);
 fevals{ii} = []
@@ -83,6 +86,7 @@ opts{ii} = opts_init;
 opts{ii}.FlipOnReject = 2;
 %Initialize States
 states{ii} = [];
+states{ii}.funcevals = 0;
 % arrays to keep track of the samples
 X{ii} = zeros(opts{ii}.DataSize,Nsamp);
 fevals{ii} = []
