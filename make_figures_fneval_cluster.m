@@ -1,4 +1,4 @@
-function make_figures_fneval_2(LeapSize,epsilon,beta)
+function make_figures_fneval_cluster(LeapSize,epsilon,beta)
 
 whos
 clc;
