@@ -48,43 +48,43 @@ FEVAL_MAX = 250000
 %Initalize Options
 ii = 1
 names{ii} = 'standard'
-opts{ii} = opts_init
+opts{ii} = opts_init;
 opts{ii}.FlipOnReject = 0;
 opts{ii}.beta = 1;
 %Initialize States
 states{ii} = [];
 % arrays to keep track of the samples
-X{ii} = zeros(opts.DataSize,Nsamp);
+X{ii} = zeros(opts{ii}.DataSize,Nsamp);
 fevals{ii} = []
 
 ii = ii + 1
 names{ii} = 'persist'
-opts{ii} = opts_init
+opts{ii} = opts_init;
 opts{ii}.FlipOnReject = 0;
 %Initialize States
 states{ii} = [];
 % arrays to keep track of the samples
-X{ii} = zeros(opts.DataSize,Nsamp);
+X{ii} = zeros(opts{ii}.DataSize,Nsamp);
 fevals{ii} = []
 
 ii = ii + 1
 names{ii} = 'reduced flip'
-opts{ii} = opts_init
+opts{ii} = opts_init;
 opts{ii}.FlipOnReject = 1;
 %Initialize States
 states{ii} = [];
 % arrays to keep track of the samples
-X{ii} = zeros(opts.DataSize,Nsamp);
+X{ii} = zeros(opts{ii}.DataSize,Nsamp);
 fevals{ii} = []
 
 ii = ii + 1
 names{ii} = 'two momentum'
-opts{ii} = opts_init
+opts{ii} = opts_init;
 opts{ii}.FlipOnReject = 2;
 %Initialize States
 states{ii} = [];
 % arrays to keep track of the samples
-X{ii} = zeros(opts.DataSize,Nsamp);
+X{ii} = zeros(opts{ii}.DataSize,Nsamp);
 fevals{ii} = []
 
 
