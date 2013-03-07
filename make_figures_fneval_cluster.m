@@ -53,7 +53,6 @@ opts{ii}.FlipOnReject = 0;
 opts{ii}.beta = 1;
 %Initialize States
 states{ii} = [];
-states{ii}.funcevals = 0;
 % arrays to keep track of the samples
 X{ii} = zeros(opts{ii}.DataSize,Nsamp);
 fevals{ii} = []
@@ -64,7 +63,6 @@ opts{ii} = opts_init;
 opts{ii}.FlipOnReject = 0;
 %Initialize States
 states{ii} = [];
-states{ii}.funcevals = 0;
 % arrays to keep track of the samples
 X{ii} = zeros(opts{ii}.DataSize,Nsamp);
 fevals{ii} = []
@@ -75,7 +73,6 @@ opts{ii} = opts_init;
 opts{ii}.FlipOnReject = 1;
 %Initialize States
 states{ii} = [];
-states{ii}.funcevals = 0;
 % arrays to keep track of the samples
 X{ii} = zeros(opts{ii}.DataSize,Nsamp);
 fevals{ii} = []
@@ -86,7 +83,6 @@ opts{ii} = opts_init;
 opts{ii}.FlipOnReject = 2;
 %Initialize States
 states{ii} = [];
-states{ii}.funcevals = 0;
 % arrays to keep track of the samples
 X{ii} = zeros(opts{ii}.DataSize,Nsamp);
 fevals{ii} = []
@@ -98,8 +94,9 @@ ttt = tic();
     for ii = 1:Nsamp  
         for jj = 1:length(names)
             tic()
-                if states{jj}.funcevals < FEVAL_MAX 
+                if ii == 1 || states{jj}.funcevals < FEVAL_MAX 
                     [Xloc, statesloc] = rf2vHMC( opts{jj}, states{jj}, theta );
+                    states{jj} = statesloc
                     if ii > 1                                        
                         X{jj} = cat(3,X{jj}, Xloc);
                     else
