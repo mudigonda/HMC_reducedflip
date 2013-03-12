@@ -7,7 +7,7 @@ h_feval = figure(111);
 
 clf();
 
-for ii in length(X)
+for ii=1:length(fevals)
     plot(fevals{ii}(2:end,1), fevals{ii}(2:end,2));
     hold on;
 end

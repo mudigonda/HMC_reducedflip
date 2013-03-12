@@ -3,7 +3,7 @@ function [h] = plot_autocorr_samples(X, names)
 h=figure(222);
 clf();
 
-for ii in length(X)
+for ii=1:length(X)
     ac{ii} = calc_autocorr(X{ii})
     plot(ac{ii});
     hold on;

@@ -103,8 +103,8 @@ ttt = tic();
                         X{jj} = Xloc;
                     end
                     
-                    fevals{jj}(ii,1) = statestandard.funcevals;
-                    fevals{jj}(ii,2) = calc_samples_err(Xstandard,theta);
+                    fevals{jj}(ii,1) = states{jj}.funcevals;
+                    fevals{jj}(ii,2) = calc_samples_err(X{jj},theta);
                 end
             toc()
         end
@@ -113,9 +113,11 @@ ttt = tic();
         if (mod( ii, 100 ) == 1) || (ii == Nsamp)
             fprintf('%d / %d in %f sec (%f sec remaining)\n', ii, Nsamp, toc(ttt), toc(ttt)*Nsamp/ii - toc(ttt) );
             h1=plot_autocorr_samples(X, names);
+						disp('Autocorr plot completed')
             h2=plot_fevals(fevals, names);
-            savestr = strcat('LeapSize-',int2str(LeapSize),'epsilon-',int2str(epsilon*10),'Beta-',int2str(beta*100));
-            disp(savestr);
+						disp('Fevals plot completed')
+            savestr = strcat('LeapSize-',int2str(opts_init.LeapSize),'epsilon-',int2str(opts_init.epsilon*10),'Beta-',int2str(opts_init.beta*100));
+            disp(savestr)
             savepath = strcat('/clusterfs/cortex/scratch/mayur/HMC_reducedflip/',savestr);
             figpath1 = strcat('/clusterfs/cortex/scratch/mayur/HMC_reducedflip/figures/',savestr,'autocor');
             figpath2 = strcat('/clusterfs/cortex/scratch/mayur/HMC_reducedflip/figures/',savestr,'fneval');
