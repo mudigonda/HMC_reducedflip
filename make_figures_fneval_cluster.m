@@ -32,6 +32,9 @@ else
     opts_init.beta = beta
 end            
 
+%Model Name
+modelname='2dGausSkew10-6'
+
 % number of times to call the sampler
 Nsamp = 5000;
 % number of sampling stpdf to take in each sampler call
@@ -42,7 +45,7 @@ opts_init.DataSize = 2;
 opts_init.funcevals = 0
 
 % scaling factor for energy function
-theta = [1,0;0,1e-3];
+theta = [1,0;0,1e-6];
 FEVAL_MAX = 250000
 
 %Initalize Options
@@ -116,11 +119,11 @@ ttt = tic();
 						disp('Autocorr plot completed')
             h2=plot_fevals(fevals, names);
 						disp('Fevals plot completed')
-            savestr = strcat('LeapSize-',int2str(opts_init.LeapSize),'epsilon-',int2str(opts_init.epsilon*10),'Beta-',int2str(opts_init.beta*100));
+            savestr = strcat('ModelName-',modelname,'LeapSize-',int2str(opts_init.LeapSize),'epsilon-',int2str(opts_init.epsilon*10),'Beta-',int2str(opts_init.beta*100));
             disp(savestr)
-            savepath = strcat('/clusterfs/cortex/scratch/mayur/HMC_reducedflip/',savestr);
-            figpath1 = strcat('/clusterfs/cortex/scratch/mayur/HMC_reducedflip/figures/',savestr,'autocor');
-            figpath2 = strcat('/clusterfs/cortex/scratch/mayur/HMC_reducedflip/figures/',savestr,'fneval');
+            savepath = strcat('/clusterfs/cortex/scratch/mayur/HMC_reducedflip/2d',savestr);
+            figpath1 = strcat('/clusterfs/cortex/scratch/mayur/HMC_reducedflip/2d/figures/',savestr,'autocor');
+            figpath2 = strcat('/clusterfs/cortex/scratch/mayur/HMC_reducedflip/2d/figures/',savestr,'fneval');
             saveas(h1,figpath1,'pdf');
             saveas(h2,figpath2,'pdf');
             save(savepath);

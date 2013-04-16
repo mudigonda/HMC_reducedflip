@@ -4,11 +4,11 @@
 %%Outputs = handle to plot
 function h_feval = plot_fevals(fevals, names)
 h_feval = figure(111);
-
+colorlist=['r','g','b','k','m','y'];
 clf();
 
 for ii=1:length(fevals)
-    plot(fevals{ii}(2:end,1), fevals{ii}(2:end,2));
+    plot(fevals{ii}(2:end,1), fevals{ii}(2:end,2),colorlist(ii));
     hold on;
 end
 
