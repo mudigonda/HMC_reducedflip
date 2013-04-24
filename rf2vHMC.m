@@ -39,7 +39,7 @@ function [X, state] = rf2vHMC( opts, state, varargin )
     if isempty(state)        
         % the random seed reset will make experiments exactly repeatable
         %reset(RandStream.getDefaultStream);
-        state.X = randn( szd, szb );
+        state.X = randn( szd, szb )*sqrtm(inv(theta)); %Scaling the initializations to be from interest distr
         state.V1 = randn( szd, szb );
 %        state.V1 = repmat(randn(szd,1),1,szb);
         if flip_on_rej == 2
