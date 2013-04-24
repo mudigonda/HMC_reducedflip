@@ -2,10 +2,10 @@
 %I could have done this easier if I had all the mat files also append and write to a single file the final values
 %but I didn't. Such is life.
 
-path='/clusterfs/cortex/scratch/mayur/HMC_reducedflip/2d'
+path='/clusterfs/cortex/scratch/mayur/HMC_reducedflip/2d/'
 
 cd(path);
-files=dir('*.mat')
+files=dir('*10-6*.mat')
 
 min_std=zeros(length(files),1);
 min_std_per=zeros(length(files),1);
