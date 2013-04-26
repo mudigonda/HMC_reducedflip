@@ -33,14 +33,16 @@ else
 end            
 
 %Model Name
+FEVAL_MAX = 500000
 modelname='2dGausSkew10-6'
 savestr = strcat('ModelName-',modelname,'-LeapSize-',int2str(opts_init.LeapSize),...
-    '-epsilon-',int2str(opts_init.epsilon*10),'-Beta-',int2str(opts_init.beta*100));
-savepath = strcat('/Users/mudigodna/Data/HMC_reducedflip/2d/',savestr);
-figpath1 = strcat('/Users/mudigodna/Data/HMC_reducedflip/2d/figures/',savestr,'autocor');
-figpath2 = strcat('/Users/mudigodna/Data/HMC_reducedflip/2d/figures/',savestr,'fneval');
+    '-epsilon-',int2str(opts_init.epsilon*10),'-Beta-',int2str(opts_init.beta*100)...
+    ,'-fevals-',int2str(FEVAL_MAX));
+savepath = strcat('/Users/mudigonda/Data/HMC_reducedflip/2d/',savestr);
+figpath1 = strcat('/Users/mudigonda/Data/HMC_reducedflip/2d/figures/',savestr,'autocor');
+figpath2 = strcat('/Users/mudigonda/Data/HMC_reducedflip/2d/figures/',savestr,'fneval');
 % number of times to call the sampler
-Nsamp = 6000;
+Nsamp = 3000;
 % number of sampling stpdf to take in each sampler call
 % 			opts_init.T = 1;
 opts_init.BatchSize = 100;
@@ -50,7 +52,7 @@ opts_init.funcevals = 0;
 
 % scaling factor for energy function
 theta = [1,0;0,1e-6];
-FEVAL_MAX = 10000
+
 
 %Initalize Options
 ii = 1
@@ -124,9 +126,9 @@ ttt = tic();
             h2=plot_fevals(fevals, names);
 						disp('Fevals plot completed')
             disp(savestr)
-%             saveas(h1,figpath1,'pdf');
-%             saveas(h2,figpath2,'pdf');
-%             save(savepath);
+            saveas(h1,figpath1,'pdf');
+            saveas(h2,figpath2,'pdf');
+            save(savepath);
         end
     end
 ttt = toc(ttt);
