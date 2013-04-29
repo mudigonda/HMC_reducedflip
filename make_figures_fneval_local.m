@@ -33,7 +33,7 @@ else
 end            
 
 %Model Name
-FEVAL_MAX = 500000
+FEVAL_MAX = 5000000
 modelname='2dGausSkew10-6'
 savestr = strcat('ModelName-',modelname,'-LeapSize-',int2str(opts_init.LeapSize),...
     '-epsilon-',int2str(opts_init.epsilon*10),'-Beta-',int2str(opts_init.beta*100)...
@@ -42,7 +42,7 @@ savepath = strcat('/Users/mudigonda/Data/HMC_reducedflip/2d/',savestr);
 figpath1 = strcat('/Users/mudigonda/Data/HMC_reducedflip/2d/figures/',savestr,'autocor');
 figpath2 = strcat('/Users/mudigonda/Data/HMC_reducedflip/2d/figures/',savestr,'fneval');
 % number of times to call the sampler
-Nsamp = 3000;
+Nsamp = 1500;
 % number of sampling stpdf to take in each sampler call
 % 			opts_init.T = 1;
 opts_init.BatchSize = 100;
@@ -97,10 +97,11 @@ X{ii} = zeros(opts{ii}.DataSize,Nsamp);
 fevals{ii} = []
 
 
-
+RUN_FLAG=1;
 ttt = tic();
+ii=1;
     % call the sampling algorithm Nsamp times
-    for ii = 1:Nsamp  
+    while (ii <=Nsamp && RUN_FLAG == 1)
         for jj = 1:length(names)
             tic()
                 if ii == 1 || states{jj}.funcevals < FEVAL_MAX 
@@ -114,6 +115,9 @@ ttt = tic();
                     
                     fevals{jj}(ii,1) = states{jj}.funcevals;
                     fevals{jj}(ii,2) = calc_samples_err(X{jj},theta);
+                else
+                    RUN_FLAG = 0;
+                    break;
                 end
             toc()
         end
@@ -130,5 +134,6 @@ ttt = tic();
             saveas(h2,figpath2,'pdf');
             save(savepath);
         end
+        ii = ii + 1;
     end
 ttt = toc(ttt);
