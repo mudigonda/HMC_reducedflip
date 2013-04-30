@@ -68,7 +68,7 @@ function [X, state] = rf2vHMC( opts, state, varargin )
         state.E = f_E( state.X, varargin{:} );
     end
 
-    global funcevals_inc
+    global funcevals_inc;
     funcevals_inc = 0;
     
     for t = 1:T % iterate over update steps
@@ -309,7 +309,7 @@ function [state] = leap_HMC(state,ind,opts,varargin)
 global funcevals_inc
 
 if isempty(ind)
-    ind = 1:size(state.V1,2);
+    ind = (ones(size(state.V1,2),1)>0);
 end
 
 f_E = getField( opts, 'E', 0 );
@@ -330,7 +330,9 @@ X1 = state.X; X1(:) = 0;
 E1 = state.E; E1(:) = 0;
 
 for ii=1:LeapSize
-    funcevals_inc = funcevals_inc + length(ind);
+    funcevals_inc = funcevals_inc + sum(ind);
+    
+    assert(max(ind) < 2);
     
     V0(:,ind) = state.V1(:,ind);
     X0(:,ind) = state.X(:,ind);

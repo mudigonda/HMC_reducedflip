@@ -34,7 +34,7 @@ end
 
 %Model Name
 FEVAL_MAX = 5000000
-modelname='2dGausSkew10-6'
+modelname='2dGausSkew10-2'
 savestr = strcat('ModelName-',modelname,'-LeapSize-',int2str(opts_init.LeapSize),...
     '-epsilon-',int2str(opts_init.epsilon*10),'-Beta-',int2str(opts_init.beta*100)...
     ,'-fevals-',int2str(FEVAL_MAX));
@@ -42,16 +42,16 @@ savepath = strcat('/Users/mudigonda/Data/HMC_reducedflip/2d/',savestr);
 figpath1 = strcat('/Users/mudigonda/Data/HMC_reducedflip/2d/figures/',savestr,'autocor');
 figpath2 = strcat('/Users/mudigonda/Data/HMC_reducedflip/2d/figures/',savestr,'fneval');
 % number of times to call the sampler
-Nsamp = 1500;
+Nsamp = 6000;
 % number of sampling stpdf to take in each sampler call
 % 			opts_init.T = 1;
-opts_init.BatchSize = 100;
+opts_init.BatchSize = 1000;
 % number of data dimensions
 opts_init.DataSize = 2;
 opts_init.funcevals = 0;
 
 % scaling factor for energy function
-theta = [1,0;0,1e-6];
+theta = [1,0;0,1e-2];
 
 
 %Initalize Options
@@ -86,6 +86,7 @@ states{ii} = [];
 X{ii} = zeros(opts{ii}.DataSize,Nsamp);
 fevals{ii} = []
 
+if 0
 ii = ii + 1
 names{ii} = 'two momentum'
 opts{ii} = opts_init;
@@ -95,7 +96,7 @@ states{ii} = [];
 % arrays to keep track of the samples
 X{ii} = zeros(opts{ii}.DataSize,Nsamp);
 fevals{ii} = []
-
+end
 
 RUN_FLAG=1;
 ttt = tic();
@@ -113,7 +114,8 @@ ii=1;
                         X{jj} = Xloc;
                     end
                     
-                    fevals{jj}(ii,1) = states{jj}.funcevals;
+                    fevals{jj}(ii,1) = states{jj}.funcevals/opts_init.BatchSize;
+                    assert(opts_init.BatchSize == size(Xloc,2));
                     fevals{jj}(ii,2) = calc_samples_err(X{jj},theta);
                 else
                     RUN_FLAG = 0;
@@ -123,7 +125,7 @@ ii=1;
         end
         
         %Display + Saving 
-        if (mod( ii, 100 ) == 1) || (ii == Nsamp)
+        if (mod( ii, 600 ) == 0) || (ii == Nsamp) || RUN_FLAG == 0
             fprintf('%d / %d in %f sec (%f sec remaining)\n', ii, Nsamp, toc(ttt), toc(ttt)*Nsamp/ii - toc(ttt) );
             h1=plot_autocorr_samples(X, names);
 						disp('Autocorr plot completed')
