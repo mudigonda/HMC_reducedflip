@@ -350,18 +350,6 @@ for ii=1:LeapSize
 end
 end
 
-% % %%%Invert the Leap
-% % %%Write it as FLF
-% % function [state] = leap_inv_HMC(state,ind,opts,varargin)
-% % if nargin < 2
-% %     ind = 1:size(state.V1,2);
-% % end
-% % state = flip_HMC(state,ind);
-% % state = leap_HMC(state,ind,opts,varargin{:});
-% % state = flip_HMC(state,ind);
-% % end
-
-%leap _inv
 
 function [state] = swap_HMC(state,ind)
 if nargin < 2

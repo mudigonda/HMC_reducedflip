@@ -34,7 +34,7 @@ end
 
 %Model Name
 FEVAL_MAX = 5000000
-modelname='2dGausSkew10-2'
+modelname='2dGausSkew10-6'
 savestr = strcat('ModelName-',modelname,'-LeapSize-',int2str(opts_init.LeapSize),...
     '-epsilon-',int2str(opts_init.epsilon*10),'-Beta-',int2str(opts_init.beta*100)...
     ,'-fevals-',int2str(FEVAL_MAX));
@@ -51,7 +51,7 @@ opts_init.DataSize = 2;
 opts_init.funcevals = 0;
 
 % scaling factor for energy function
-theta = [1,0;0,1e-2];
+theta = [1,0;0,1e-6];
 
 
 %Initalize Options
