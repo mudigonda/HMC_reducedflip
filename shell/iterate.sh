@@ -2,18 +2,24 @@
 #Leap Size
 param1=11
 param2=1.3
-param3=.5
+param3=.04
+JobFile="param_test.sh"
 #LeapSize
-for i in 1 5 10 15 20
+for LeapSize in 14 16
 do
 #Epsilon
-		for j in $(seq .8 .1 $param2);
+		for Epsilon in $(seq .8 .1 $param2);
 		do
 			#Beta
-			for k in $(seq .01 .05 $param3);
+			for Beta in $(seq .01 .01 $param3);
 			do
-				echo $i,$j,$k
-				qsub param_test.sh  -v "LeapSize=$i,Epsilon=$j,Beta=$k"
+				echo $LeapSize,$Epsilon,$Beta
+				Outfile=/global/home/users/mayur/Logs/HMCredflip_$LeapSize-$Epsilon-$Beta.o
+				Errorfile=/global/home/users/mayur/Errors/HMCredflip_$LeapSize-$Epsilon-$Beta.e
+				export LeapSize
+				export Epsilon
+				export Beta
+				sbatch -o $Outfile -e $Errorfile -J HMCredflip $JobFile
 			done
 		done
 done

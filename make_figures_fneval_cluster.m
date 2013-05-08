@@ -34,7 +34,8 @@ end
 
 %Model Name
 modelname='2dGausSkew10-6'
-savestr = strcat('ModelName-',modelname,'-LeapSize-',int2str(opts_init.LeapSize),'-epsilon-',int2str(opts_init.epsilon*10),'-Beta-',int2str(opts_init.beta*100));
+FEVAL_MAX = 10000000
+savestr = strcat('ModelName-',modelname,'-LeapSize-',int2str(opts_init.LeapSize),'-epsilon-',int2str(opts_init.epsilon*10),'-Beta-',int2str(opts_init.beta*100),'-fevals-',int2str(FEVAL_MAX));
 savepath = strcat('/clusterfs/cortex/scratch/mayur/HMC_reducedflip/2d/',savestr);
 figpath1 = strcat('/clusterfs/cortex/scratch/mayur/HMC_reducedflip/2d/figures/',savestr,'autocor');
 figpath2 = strcat('/clusterfs/cortex/scratch/mayur/HMC_reducedflip/2d/figures/',savestr,'fneval');
@@ -42,14 +43,14 @@ figpath2 = strcat('/clusterfs/cortex/scratch/mayur/HMC_reducedflip/2d/figures/',
 Nsamp = 6000;
 % number of sampling stpdf to take in each sampler call
 % 			opts_init.T = 1;
-opts_init.BatchSize = 100;
+opts_init.BatchSize = 1000;
 % number of data dimensions
 opts_init.DataSize = 2;
 opts_init.funcevals = 0
 
 % scaling factor for energy function
 theta = [1,0;0,1e-6];
-FEVAL_MAX = 300000
+
 
 %Initalize Options
 ii = 1
@@ -83,6 +84,7 @@ states{ii} = [];
 X{ii} = zeros(opts{ii}.DataSize,Nsamp);
 fevals{ii} = []
 
+if 0
 ii = ii + 1
 names{ii} = 'two momentum'
 opts{ii} = opts_init;
@@ -92,12 +94,12 @@ states{ii} = [];
 % arrays to keep track of the samples
 X{ii} = zeros(opts{ii}.DataSize,Nsamp);
 fevals{ii} = []
-
-
-
+end
+ii=1;
+RUN_FLAG=1
 ttt = tic();
     % call the sampling algorithm Nsamp times
-    for ii = 1:Nsamp  
+			while( ii<=Nsamp && RUN_FLAG== 1)
         for jj = 1:length(names)
             tic()
                 if ii == 1 || states{jj}.funcevals < FEVAL_MAX 
@@ -109,14 +111,18 @@ ttt = tic();
                         X{jj} = Xloc;
                     end
                     
+										states{jj}.funcevals = states{jj}.funcevals/opts_init.BatchSize;
                     fevals{jj}(ii,1) = states{jj}.funcevals;
                     fevals{jj}(ii,2) = calc_samples_err(X{jj},theta);
-                end
+								else
+										RUN_FLAG=0
+										break;
+								end
             toc()
         end
         
         %Display + Saving 
-        if (mod( ii, 100 ) == 1) || (ii == Nsamp)
+        if (mod( ii, 500 ) == 0) || (ii == Nsamp)|| RUN_FLAG==0
             fprintf('%d / %d in %f sec (%f sec remaining)\n', ii, Nsamp, toc(ttt), toc(ttt)*Nsamp/ii - toc(ttt) );
             h1=plot_autocorr_samples(X, names);
 						disp('Autocorr plot completed')
@@ -127,5 +133,6 @@ ttt = tic();
             saveas(h2,figpath2,'pdf');
             save(savepath);
         end
+				ii = ii + 1;
     end
 ttt = toc(ttt);

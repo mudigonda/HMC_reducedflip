@@ -1,10 +1,19 @@
-#!/bin/bash
+#!/bin/bash -l
+source /usr/Modules/init/bash
 
-#PBS -q cortex
-#PBS -l nodes=1:ppn=2:gpu
-#PBS -l walltime=32:35:00
-#PBS -o /global/home/users/mayur/Logs
-#PBS -e /global/home/users/mayur/Errors
+#SBATCH --job-name=HMC_oneparam
+#SBATCH -p cortex
+#SBATCH --nodes=1
+#SBATCH --ntasks-per-node=2
+#SBATCH --time=03:30:00
+#SBATCH -o /global/home/users/mayur/Logs/hmc_1pt2_15_pt03.o
+#SBATCH -e /global/home/users/mayur/Errors/hmc_1pt2_15_pt03.e
 cd /global/home/users/mayur/HMC_reducedflip/
 module load matlab 
-matlab -nodisplay -nojvm -r "make_figures_fneval_cluster_wrapper" 
+Epsilon=1.2
+LeapSize=15
+Beta=0.03
+echo "Epsilon = ",$Epsilon
+echo "Leap Size = ",$LeapSize
+echo "Beta = ",$Beta
+matlab -nodisplay -nojvm -r "make_figures_fneval_cluster $LeapSize $Epsilon $Beta"
