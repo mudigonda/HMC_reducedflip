@@ -262,7 +262,7 @@ function [X, state] = rf2vHMC( opts, state, varargin )
         state.steps.total = state.steps.total + 1;    
     end
     
-    state.funcevals = state.funcevals + funcevals_inc;
+    state.funcevals = state.funcevals + funcevals_inc/szb;
     
     X = state.X;
 end
