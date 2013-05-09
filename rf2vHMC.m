@@ -104,7 +104,7 @@ function [X, state] = rf2vHMC( opts, state, varargin )
                 %Standard HMC flipping = 1 - leap
                 case 0
                     state.V1(:,bd) = -state.V1(:,bd);   
-                    state.steps.flip = state.steps.flip +1;
+                    state.steps.flip = state.steps.flip + sum(bd);
                 %Jascha - reduced flipping
                 case 1
                     %run the 
