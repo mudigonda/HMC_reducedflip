@@ -103,7 +103,8 @@ function [X, state] = rf2vHMC( opts, state, varargin )
                 
                 %Standard HMC flipping = 1 - leap
                 case 0
-                    state.V1(:,bd) = -state.V1(:,bd);   
+                    state = flip_HMC(state,bd);
+                    %state.V1(:,bd) = -state.V1(:,bd);   
                     state.steps.flip = state.steps.flip + sum(bd);
                 %Jascha - reduced flipping
                 case 1
@@ -113,8 +114,9 @@ function [X, state] = rf2vHMC( opts, state, varargin )
                     r_LF = leap_prob(F_state,LF_state,flip_on_rej);
                     r_F = r_LF - r_L;
                     r_F(r_F < 0) = 0;
-                    flip_ind = (rnd_cmp < r_L + r_F) & bd;                   
-                    state.V1(:,flip_ind) = -state.V1(:,flip_ind);
+                    flip_ind = (rnd_cmp < r_L + r_F) & bd;
+                    state = flip_HMC(state,flip_ind);
+                    %state.V1(:,flip_ind) = -state.V1(:,flip_ind);
                     state.steps.flip = state.steps.flip + sum(flip_ind);
                     state.steps.stay = state.steps.stay + sum(~flip_ind);
                     
