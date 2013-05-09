@@ -376,6 +376,7 @@ end
 
 %function to evaluate hamiltonian of a state
 %%Use a buffer 
+% TODO(jascha) naming scheme -- potential to energy and/or log_probability
 function [potential] = hamiltonian_HMC(state,ind,flip_on_rej)
 if isempty(ind)
     ind = 1:size(state.V1,2);
@@ -391,13 +392,15 @@ else
 %     potential = E + (1/2) * (V1'*V1);
     potential = E + (1/2) * (sum(V1.*V1));
 end
-%negate the potential so you can just exponentiate directly
+%negate the energy so you can just exponentiate directly
 potential = -potential;
 end
 
 %
 function [prob] = leap_prob(start_state, leap_state,flip_on_rej)
 
-prob = min(1,exp(hamiltonian_HMC(leap_state,[],flip_on_rej))./...
-exp(hamiltonian_HMC(start_state,[],flip_on_rej)));
+prob = min(1,exp(hamiltonian_HMC(leap_state,[],flip_on_rej)) - hamiltonian_HMC(start_state,[],flip_on_rej)));
+
+%prob = min(1,exp(hamiltonian_HMC(leap_state,[],flip_on_rej))./...
+%exp(hamiltonian_HMC(start_state,[],flip_on_rej)));
 end
