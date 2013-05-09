@@ -5,7 +5,7 @@
 path='/clusterfs/cortex/scratch/mayur/HMC_reducedflip/2d/'
 
 cd(path);
-files=dir('*10-6*feval*.mat')
+files=dir('*Circle*.mat')
 
 min_std=zeros(length(files),1);
 min_std_per=zeros(length(files),1);
