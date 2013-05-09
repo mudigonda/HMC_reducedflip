@@ -16,9 +16,13 @@ function [X, state] = rf2vHMC( opts, state, varargin )
     dut = 0.5; % fraction of the momentum to be replaced per unit time
     %dut = 0;
     epsilon = getField( opts, 'epsilon', 0.1 );
-    beta = 1 - exp( log( dut ) * epsilon );  % replace a fraction dut of the momentum
-    beta = getField( opts, 'beta', beta );
-    
+		try
+			beta = getField( opts, 'beta', beta );
+			sprintf('Value of Beta is %f',beta)
+		catch 
+			beta = 1 - exp( log( dut ) * epsilon );  % replace a fraction dut of the momentum
+			sprintf('Value of Beta is %f',beta)
+		end 
     % DEBUG
     %beta = 0.03;
     %beta
