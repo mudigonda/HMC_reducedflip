@@ -103,7 +103,8 @@ function [X, state] = rf2vHMC( opts, state, varargin )
                 
                 %Standard HMC flipping = 1 - leap
                 case 0
-                    state.V1(:,bd) = -state.V1(:,bd);   
+                    state = flip_HMC(state,bd);
+                    %state.V1(:,bd) = -state.V1(:,bd);   
                     state.steps.flip = state.steps.flip + sum(bd);
                 %Jascha - reduced flipping
                 case 1
@@ -113,8 +114,9 @@ function [X, state] = rf2vHMC( opts, state, varargin )
                     r_LF = leap_prob(F_state,LF_state,flip_on_rej);
                     r_F = r_LF - r_L;
                     r_F(r_F < 0) = 0;
-                    flip_ind = (rnd_cmp < r_L + r_F) & bd;                   
-                    state.V1(:,flip_ind) = -state.V1(:,flip_ind);
+                    flip_ind = (rnd_cmp < r_L + r_F) & bd;
+                    state = flip_HMC(state,flip_ind);
+                    %state.V1(:,flip_ind) = -state.V1(:,flip_ind);
                     state.steps.flip = state.steps.flip + sum(flip_ind);
                     state.steps.stay = state.steps.stay + sum(~flip_ind);
                     
@@ -374,6 +376,7 @@ end
 
 %function to evaluate hamiltonian of a state
 %%Use a buffer 
+% TODO(jascha) naming scheme -- potential to energy and/or log_probability
 function [potential] = hamiltonian_HMC(state,ind,flip_on_rej)
 if isempty(ind)
     ind = 1:size(state.V1,2);
@@ -389,13 +392,15 @@ else
 %     potential = E + (1/2) * (V1'*V1);
     potential = E + (1/2) * (sum(V1.*V1));
 end
-%negate the potential so you can just exponentiate directly
+%negate the energy so you can just exponentiate directly
 potential = -potential;
 end
 
 %
 function [prob] = leap_prob(start_state, leap_state,flip_on_rej)
 
-prob = min(1,exp(hamiltonian_HMC(leap_state,[],flip_on_rej))./...
-exp(hamiltonian_HMC(start_state,[],flip_on_rej)));
+prob = min(1,exp(hamiltonian_HMC(leap_state,[],flip_on_rej)) - hamiltonian_HMC(start_state,[],flip_on_rej)));
+
+%prob = min(1,exp(hamiltonian_HMC(leap_state,[],flip_on_rej))./...
+%exp(hamiltonian_HMC(start_state,[],flip_on_rej)));
 end
