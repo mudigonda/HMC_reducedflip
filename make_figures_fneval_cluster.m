@@ -111,7 +111,7 @@ ttt = tic();
                         X{jj} = Xloc;
                     end
                     
-										states{jj}.funcevals = states{jj}.funcevals/opts_init.BatchSize;
+										%states{jj}.funcevals = states{jj}.funcevals/opts_init.BatchSize;
                     fevals{jj}(ii,1) = states{jj}.funcevals;
                     fevals{jj}(ii,2) = calc_samples_err(X{jj},theta);
 								else

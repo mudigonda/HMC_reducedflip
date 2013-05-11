@@ -16,13 +16,9 @@ function [X, state] = rf2vHMC( opts, state, varargin )
     dut = 0.5; % fraction of the momentum to be replaced per unit time
     %dut = 0;
     epsilon = getField( opts, 'epsilon', 0.1 );
-		try
-			beta = getField( opts, 'beta', beta );
-			sprintf('Value of Beta is %f',beta)
-		catch 
-			beta = 1 - exp( log( dut ) * epsilon );  % replace a fraction dut of the momentum
-			sprintf('Value of Beta is %f',beta)
-		end 
+    beta = 1 - exp( log( dut ) * epsilon );    
+    beta = getField( opts, 'beta', beta);
+    sprintf('Value of Beta is %f',beta)				
     % DEBUG
     %beta = 0.03;
     %beta
@@ -43,15 +39,15 @@ function [X, state] = rf2vHMC( opts, state, varargin )
     if isempty(state)        
         % the random seed reset will make experiments exactly repeatable
         %reset(RandStream.getDefaultStream);
-        state.X = sqrtm(inv(varargin{:}))*randn( szd, szb ); %Scaling the initializations to be from interest distr
+        %Scaling the initializations to be from interest distr
+        %Not doing this for circle
+        state.X = sqrtm(inv(varargin{:}))*randn( szd, szb ); 
         state.V1 = randn( szd, szb );
-%        state.V1 = repmat(randn(szd,1),1,szb);
         if flip_on_rej == 2
              state.V2 = randn(szd,szb);
-%            state.V2 = repmat(randn(szd,1),1,szb);
         end
-        state.X(:) = 0;
-        state.X(1,:) = 1;
+        state.X(:) = 0;% use this for not initalizing the samples from the interest distrib
+        state.X(1,:) = 1;% ditto above
         % state.steps provides counters for each kind of transition
         state.steps = [];
         state.steps.leap = 0;
@@ -403,8 +399,7 @@ end
 %
 function [prob] = leap_prob(start_state, leap_state,flip_on_rej)
 
-prob = min(1,exp(hamiltonian_HMC(leap_state,[],flip_on_rej)) - hamiltonian_HMC(start_state,[],flip_on_rej)));
-
-%prob = min(1,exp(hamiltonian_HMC(leap_state,[],flip_on_rej))./...
-%exp(hamiltonian_HMC(start_state,[],flip_on_rej)));
+numerator = hamiltonian_HMC(leap_state,[],flip_on_rej);
+denominator = hamiltonian_HMC(start_state,[],flip_on_rej);
+prob = min(1,exp(numerator - denominator));
 end
