@@ -46,8 +46,8 @@ function [X, state] = rf2vHMC( opts, state, varargin )
         if flip_on_rej == 2
              state.V2 = randn(szd,szb);
         end
-        state.X(:) = 0;% use this for not initalizing the samples from the interest distrib
-        state.X(1,:) = 1;% ditto above
+        %state.X(:) = 0;% use this for not initalizing the samples from the interest distrib
+        %state.X(1,:) = 1;% ditto above
         % state.steps provides counters for each kind of transition
         state.steps = [];
         state.steps.leap = 0;
@@ -92,7 +92,7 @@ function [X, state] = rf2vHMC( opts, state, varargin )
         % TODO this will only work for batch size 1
         if sum(gd) > 0
             state = update_state(state,L_state,gd,flip_on_rej);
-            state.steps.leap = state.steps.leap + 1;
+            state.steps.leap = state.steps.leap + sum(gd);
         end
         % bd indexes the samples for which the forward transition was rejected
         bd = rnd_cmp > r_L;
@@ -118,7 +118,7 @@ function [X, state] = rf2vHMC( opts, state, varargin )
                     state = flip_HMC(state,flip_ind);
                     %state.V1(:,flip_ind) = -state.V1(:,flip_ind);
                     state.steps.flip = state.steps.flip + sum(flip_ind);
-                    state.steps.stay = state.steps.stay + sum(~flip_ind);
+                    state.steps.stay = state.steps.stay + sum(~flip_ind) - sum(gd);
                     
                 %Jascha + Mayur - 2 momentum variable 
                 case 2
@@ -261,7 +261,7 @@ function [X, state] = rf2vHMC( opts, state, varargin )
             state.V2  = real(sqrt(1-beta)) * state.V2 + sqrt(beta) * N2; % numerical errors if beta == 1
             state.V2 = N2;
         end
-        state.steps.total = state.steps.total + 1;    
+        state.steps.total = state.steps.total + szb;    
     end
     
     state.funcevals = state.funcevals + funcevals_inc/szb;
