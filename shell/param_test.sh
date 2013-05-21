@@ -2,7 +2,7 @@
 source /usr/Moudles/init/bash
 
 #SBATCH -p cortex
-#SBATCH --time=05:30:00
+#SBATCH --time=12:30:00
 
 cd /global/home/users/mayur/HMC_reducedflip/
 echo "Epsilon = ",$Epsilon

@@ -33,7 +33,7 @@ else
 end            
 
 %Model Name
-modelname='2dGausSkew10-6'
+modelname='100dGausSkew10-6'
 FEVAL_MAX = 10000000
 savestr = strcat('ModelName-',modelname,'-LeapSize-',int2str(opts_init.LeapSize),'-epsilon-',int2str(opts_init.epsilon*10),'-Beta-',int2str(opts_init.beta*100),'-fevals-',int2str(FEVAL_MAX));
 savepath = strcat('/clusterfs/cortex/scratch/mayur/HMC_reducedflip/2d/',savestr);
@@ -43,14 +43,14 @@ figpath2 = strcat('/clusterfs/cortex/scratch/mayur/HMC_reducedflip/2d/figures/',
 Nsamp = 6000;
 % number of sampling stpdf to take in each sampler call
 % 			opts_init.T = 1;
-opts_init.BatchSize = 1000;
+opts_init.BatchSize = 500;
 % number of data dimensions
-opts_init.DataSize = 2;
+opts_init.DataSize = 100;
 opts_init.funcevals = 0
 
 % scaling factor for energy function
-theta = [1,0;0,1e-6];
-
+%theta = [1,0;0,1e-6];
+theta = diag(exp(linspace(log(1e-6), log(1), 100)));
 
 %Initalize Options
 ii = 1

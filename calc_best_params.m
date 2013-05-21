@@ -5,7 +5,7 @@
 path='/clusterfs/cortex/scratch/mayur/HMC_reducedflip/2d/'
 
 cd(path);
-files=dir('*Circle*.mat')
+files=dir('*100dGaus*.mat')
 
 min_std=zeros(length(files),1);
 min_std_per=zeros(length(files),1);
@@ -15,6 +15,7 @@ min_2mom=zeros(length(files),1);
 
 %Loop over 
 for i=1:length(files)
+	sprintf('This is the i %d',i)
 	load(files(i).name);
 	min_std(i)=fevals{1}(end,2);
 	min_std_per(i)=fevals{2}(end,2);
@@ -61,5 +62,5 @@ X{3}=X_red_plot;
 h_final = plot_fevals(fevals,names)
 h_ac_final = plot_autocorr_samples(X,names)
 
-saveas(h_final,'/global/home/users/mayur/final.pdf')
+saveas(h_final,'/global/home/users/mayur/fevals_final.pdf')
 saveas(h_ac_final,'/global/home/users/mayur/ac_final.pdf')
