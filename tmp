@@ -1,0 +1,82 @@
+1c1
+< function make_figures_fneval_local(LeapSize,epsilon,beta)
+---
+> function make_figures_fneval_cluster(LeapSize,epsilon,beta)
+23c23
+<     opts_init.epsilon = .1;
+---
+>     opts_init.epsilon = 1.2;
+29c29
+<     opts_init.beta = .075;
+---
+>     opts_init.beta = .03;
+36,48c36,41
+< 
+< FEVAL_MAX = 5000000
+< % modelname='2dCircle100'
+< modelname='2dGaussian'
+< savestr = strcat('ModelName-',modelname,'-LeapSize-',int2str(opts_init.LeapSize),...
+<     '-epsilon-',int2str(opts_init.epsilon*10),'-Beta-',int2str(opts_init.beta*100)...
+<     ,'-fevals-',int2str(FEVAL_MAX));
+< % % savestr = strcat('ModelName-',modelname,'-LeapSize-',int2str(opts_init.LeapSize),...
+< % %     '-epsilon-',int2str(opts_init.epsilon*10),...
+< % %     '-fevals-',int2str(FEVAL_MAX));
+< savepath = strcat('/Users/mudigonda/Data/HMC_reducedflip/2d/',savestr);
+< figpath1 = strcat('/Users/mudigonda/Data/HMC_reducedflip/2d/figures/',savestr,'autocor');
+< figpath2 = strcat('/Users/mudigonda/Data/HMC_reducedflip/2d/figures/',savestr,'fneval');
+---
+> modelname='2dGausSkew10-6'
+> FEVAL_MAX = 10000000
+> savestr = strcat('ModelName-',modelname,'-LeapSize-',int2str(opts_init.LeapSize),'-epsilon-',int2str(opts_init.epsilon*10),'-Beta-',int2str(opts_init.beta*100),'-fevals-',int2str(FEVAL_MAX));
+> savepath = strcat('/clusterfs/cortex/scratch/mayur/HMC_reducedflip/2d/',savestr);
+> figpath1 = strcat('/clusterfs/cortex/scratch/mayur/HMC_reducedflip/2d/figures/',savestr,'autocor');
+> figpath2 = strcat('/clusterfs/cortex/scratch/mayur/HMC_reducedflip/2d/figures/',savestr,'fneval');
+50c43
+< Nsamp = 1000;
+---
+> Nsamp = 6000;
+53c46
+< opts_init.BatchSize = 100;
+---
+> opts_init.BatchSize = 1000;
+56c49
+< opts_init.funcevals = 0;
+---
+> opts_init.funcevals = 0
+60d52
+< % % theta = 100; %%circle
+106,108d97
+< 
+< RUN_FLAG=1;
+< ttt = tic();
+109a99,100
+> RUN_FLAG=1
+> ttt = tic();
+111c102
+<     while (ii <=Nsamp && RUN_FLAG == 1)
+---
+> 			while( ii<=Nsamp && RUN_FLAG== 1)
+123,124c114,115
+<                     fevals{jj}(ii,1) = states{jj}.funcevals/opts_init.BatchSize;
+<                     assert(opts_init.BatchSize == size(Xloc,2));
+---
+> 										%states{jj}.funcevals = states{jj}.funcevals/opts_init.BatchSize;
+>                     fevals{jj}(ii,1) = states{jj}.funcevals;
+126,129c117,120
+<                 else
+<                     RUN_FLAG = 0;
+<                     break;
+<                 end
+---
+> 								else
+> 										RUN_FLAG=0
+> 										break;
+> 								end
+134c125
+<         if (mod( ii, 1000 ) == 0) || (ii == Nsamp) || RUN_FLAG == 0
+---
+>         if (mod( ii, 500 ) == 0) || (ii == Nsamp)|| RUN_FLAG==0
+145c136
+<         ii = ii + 1;
+---
+> 				ii = ii + 1;

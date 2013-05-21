@@ -41,7 +41,8 @@ function [X, state] = rf2vHMC( opts, state, varargin )
         %reset(RandStream.getDefaultStream);
         %Scaling the initializations to be from interest distr
         %Not doing this for circle
-        state.X = sqrtm(inv(varargin{:}))*randn( szd, szb ); 
+%         state.X = sqrtm(inv(varargin{:}))*randn( szd, szb ); 
+        state.X = randn( szd, szb ); 
         state.V1 = randn( szd, szb );
         if flip_on_rej == 2
              state.V2 = randn(szd,szb);

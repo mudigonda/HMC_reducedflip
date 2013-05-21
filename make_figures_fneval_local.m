@@ -6,10 +6,10 @@ close all;
 opts_init = [];
 % the energy function and gradient for the circle distribution in the arXiv
 % TODO: I think I should have used a very long narrow Gaussian instead!
-% opts_init.E = @E_circle;
-opts_init.E = @E_gauss;
-% opts_init.dEdX = @dEdX_circle;
-opts_init.dEdX = @dEdX_gauss;
+% opts_init.E = @E_gauss;
+opts_init.E = @E_gaussMixture;
+% opts_init.dEdX = @dEdX_gauss;
+opts_init.dEdX= @dEdX_gaussMixture;
 % make this 1 for more output
 opts_init.Debug = 0;
 % step size for HMC
@@ -36,7 +36,7 @@ end
 
 FEVAL_MAX = 5000000
 % modelname='2dCircle100'
-modelname='2dGaussian'
+modelname='10dMOG'
 savestr = strcat('ModelName-',modelname,'-LeapSize-',int2str(opts_init.LeapSize),...
     '-epsilon-',int2str(opts_init.epsilon*10),'-Beta-',int2str(opts_init.beta*100)...
     ,'-fevals-',int2str(FEVAL_MAX));
@@ -50,14 +50,19 @@ figpath2 = strcat('/Users/mudigonda/Data/HMC_reducedflip/2d/figures/',savestr,'f
 Nsamp = 1000;
 % number of sampling stpdf to take in each sampler call
 % 			opts_init.T = 1;
-opts_init.BatchSize = 100;
+opts_init.BatchSize = 10;
 % number of data dimensions
 opts_init.DataSize = 2;
 opts_init.funcevals = 0;
 
 % scaling factor for energy function
-theta = [1,0;0,1e-6];
+% theta = [1,0;0,1e-6];
 % % theta = 100; %%circle
+for ii=1:opts_init.DataSize
+   rng(ii);
+   J{ii}=diag(exp(linspace(log(1e-6), log(1), opts_init.DataSize)).*randn(1,opts_init.DataSize));
+   Mu{ii}=randn(1,opts_init.DataSize);
+end
 
 
 %Initalize Options
@@ -112,7 +117,7 @@ ii=1;
         for jj = 1:length(names)
             tic()
                 if ii == 1 || states{jj}.funcevals < FEVAL_MAX 
-                    [Xloc, statesloc] = rf2vHMC( opts{jj}, states{jj}, theta );
+                    [Xloc, statesloc] = rf2vHMC( opts{jj}, states{jj}, J, Mu );
                     states{jj} = statesloc
                     if ii > 1                                        
                         X{jj} = cat(3,X{jj}, Xloc);
@@ -122,7 +127,7 @@ ii=1;
                     
                     fevals{jj}(ii,1) = states{jj}.funcevals;
                     assert(opts_init.BatchSize == size(Xloc,2));
-                    fevals{jj}(ii,2) = calc_samples_err(X{jj},theta);
+                    fevals{jj}(ii,2) = calc_samples_err(X{jj},J, Mu);
                 else
                     RUN_FLAG = 0;
                     break;
@@ -131,9 +136,15 @@ ii=1;
         end
         
         %Display + Saving 
-        if (mod( ii, 1000 ) == 0) || (ii == Nsamp) || RUN_FLAG == 0
+        if (mod( ii, 100 ) == 0) || (ii == Nsamp) || RUN_FLAG == 0
             fprintf('%d / %d in %f sec (%f sec remaining)\n', ii, Nsamp, toc(ttt), toc(ttt)*Nsamp/ii - toc(ttt) );
-            h1=plot_autocorr_samples(X, names);
+            %Calculate average fevals by taking total fevals at this point
+            %and dividing it by the number of samples we have acquired
+            sprintf('calculating average fevals')
+            for jj=1:length(names)
+                avg_fevals{jj}=fevals{jj}(end,1)/size(X{jj},3);
+            end
+            h1=plot_autocorr_samples(X, names,avg_fevals);
 						disp('Autocorr plot completed')
             h2=plot_fevals(fevals, names);
 						disp('Fevals plot completed')
