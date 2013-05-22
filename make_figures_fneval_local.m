@@ -14,19 +14,19 @@ opts_init.dEdX= @dEdX_gaussMixture;
 opts_init.Debug = 0;
 % step size for HMC
 if nargin<1
-    opts_init.LeapSize = 1;
+    opts_init.LeapSize = 50;
 else
     LeapSize=str2num(LeapSize);
     opts_init.LeapSize = LeapSize
 end
 if nargin<2
-    opts_init.epsilon = .1;
+    opts_init.epsilon = 1.3;
 else
     epsilon =str2num(epsilon);
     opts_init.epsilon = epsilon
 end
 if nargin<3
-    opts_init.beta = .075;
+    opts_init.beta = .35;
 else
     beta    =str2num(beta);
     opts_init.beta = beta
@@ -36,7 +36,7 @@ end
 
 FEVAL_MAX = 5000000
 % modelname='2dCircle100'
-modelname='10dMOG'
+modelname='100dMOG'
 savestr = strcat('ModelName-',modelname,'-LeapSize-',int2str(opts_init.LeapSize),...
     '-epsilon-',int2str(opts_init.epsilon*10),'-Beta-',int2str(opts_init.beta*100)...
     ,'-fevals-',int2str(FEVAL_MAX));
@@ -52,7 +52,7 @@ Nsamp = 1000;
 % 			opts_init.T = 1;
 opts_init.BatchSize = 10;
 % number of data dimensions
-opts_init.DataSize = 2;
+opts_init.DataSize = 100;
 opts_init.funcevals = 0;
 
 % scaling factor for energy function
@@ -60,8 +60,8 @@ opts_init.funcevals = 0;
 % % theta = 100; %%circle
 for ii=1:opts_init.DataSize
    rng(ii);
-   J{ii}=diag(exp(linspace(log(1e-6), log(1), opts_init.DataSize)).*randn(1,opts_init.DataSize));
-   Mu{ii}=randn(1,opts_init.DataSize);
+   J{ii}=diag(exp(linspace(log(1e-6), log(1), opts_init.DataSize)).*rand(1,opts_init.DataSize));
+   Mu{ii}=randn(opts_init.DataSize,1)*ceil(10e-4*rand(1));
 end
 
 
@@ -127,7 +127,7 @@ ii=1;
                     
                     fevals{jj}(ii,1) = states{jj}.funcevals;
                     assert(opts_init.BatchSize == size(Xloc,2));
-                    fevals{jj}(ii,2) = calc_samples_err(X{jj},J, Mu);
+%                     fevals{jj}(ii,2) = calc_samples_err(X{jj},J, Mu);
                 else
                     RUN_FLAG = 0;
                     break;
@@ -146,11 +146,11 @@ ii=1;
             end
             h1=plot_autocorr_samples(X, names,avg_fevals);
 						disp('Autocorr plot completed')
-            h2=plot_fevals(fevals, names);
+%             h2=plot_fevals(fevals, names);
 						disp('Fevals plot completed')
             disp(savestr)
             saveas(h1,figpath1,'pdf');
-            saveas(h2,figpath2,'pdf');
+%             saveas(h2,figpath2,'pdf');
             save(savepath);
         end
         ii = ii + 1;

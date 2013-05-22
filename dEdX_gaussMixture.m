@@ -9,7 +9,7 @@ function dEdX = dEdX_gauss( X, J, mu )
 
     for ii = 1:length(J)
         Jl = J{ii};
-        Xl = bsxfun( @plus, X, repmat(-mu{ii},size(X,2),1)');
+        Xl = bsxfun( @plus, X, -mu{ii});
         px = px + exp(-0.5*sum( Xl.*(Jl*Xl), 1 ));
     end
 
@@ -17,11 +17,12 @@ function dEdX = dEdX_gauss( X, J, mu )
     
     for ii = 1:length(J)
         Jl = J{ii};
-        Xl = bsxfun( @plus, X, repmat(-mu{ii},size(X,2),1)');
-        dEdX = dEdX + exp(-0.5*sum( Xl.*(Jl*Xl), 1 ))*(0.5*Jl*Xl + 0.5*Jl'*Xl);
+        Xl = bsxfun( @plus, X, -mu{ii});
+        dEdX = dEdX + repmat(exp(-0.5*sum( Xl.*(Jl*Xl), 1 )),size(X,1),1)...
+        .*(0.5*Jl*Xl + 0.5*Jl'*Xl);
     end
     
-    dEdX = dEdX/px;
+    dEdX = dEdX./repmat(px,size(X,1),1);
     
     if ~isfinite(E)
         dEdX(:) = 0;
