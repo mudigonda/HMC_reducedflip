@@ -39,8 +39,8 @@ FEVAL_MAX = 5000000
 % modelname='2dCircle100'
 modelname='100dMOG'
 Nsamp = 1000;
-opts_init.BatchSize = 10;
-opts_init.DataSize = 100;
+opts_init.BatchSize = 100;
+opts_init.DataSize = 10;
 savestr = strcat('ModelName-',modelname,'-LeapSize-',int2str(opts_init.LeapSize),...
     '-epsilon-',int2str(opts_init.epsilon*10),'-Beta-',int2str(opts_init.beta*100)...
     ,'-fevals-',int2str(FEVAL_MAX),'-Nsamp-',int2str(Nsamp)...
@@ -125,6 +125,7 @@ ii=1;
                     
                     fevals{jj}(ii,1) = states{jj}.funcevals;
                     assert(opts_init.BatchSize == size(Xloc,2));
+%                     lle{jj}=calculate_lle(Xloc,J,Mu);
 %                     fevals{jj}(ii,2) = calc_samples_err(X{jj},J, Mu);
                 else
                     RUN_FLAG = 0;
@@ -142,8 +143,12 @@ ii=1;
             for jj=1:length(names)
                 avg_fevals{jj}=fevals{jj}(end,1)/size(X{jj},3);
             end
-            [h1,h2]=plot_autocorr_samples(X, names,avg_fevals);
-						disp('Autocorr plot completed')
+            if exist('Mu','var')
+                [h1,h2]=plot_autocorr_samples(X, names,avg_fevals,Mu);
+            else
+                [h1,h2]=plot_autocorr_samples(X, names,avg_fevals);
+            end
+                disp('Autocorr plot completed')
 %             h2=plot_fevals(fevals, names);
 						disp('Fevals plot completed')
             disp(savestr)
