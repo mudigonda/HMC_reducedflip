@@ -2,7 +2,16 @@
 %I could have done this easier if I had all the mat files also append and write to a single file the final values
 %but I didn't. Such is life.
 
-path='/clusterfs/cortex/scratch/mayur/HMC_reducedflip/2d/'
+function calc_best_params(path,projdir)
+if nargin <1
+	path='/clusterfs/cortex/scratch/mayur/HMC_reducedflip/2d/'
+end
+
+if nargin<2
+	projpath='/global/home/users/mudigonda/HMC_reducedflip/'
+end
+
+HOME=getenv('HOME');
 
 cd(path);
 files=dir('*100dGaus*.mat')
@@ -45,7 +54,7 @@ X_red_plot = X{3};
 %sprintf('Two momentum model fname %s',files(min_2_mom_idx).name)
 %X_2mom_plot = X{4};
 
-cd('/global/home/users/mayur/HMC_reducedflip')
+cd(projpath);
 %making new cell arrays that reflect the appropriate data
 clear X;
 clear fevals;
@@ -59,8 +68,8 @@ X{2}=X_per_plot;
 X{3}=X_red_plot;
 %X{4}=X_2mom_plot;
 
-h_final = plot_fevals(fevals,names)
-h_ac_final = plot_autocorr_samples(X,names)
+%h_final = plot_fevals(fevals,names)
+[h_ac_final,h_ac_final2] = plot_autocorr_samples(X,names)%%what do i do about the Mu's???
 
-saveas(h_final,'/global/home/users/mayur/fevals_final.pdf')
-saveas(h_ac_final,'/global/home/users/mayur/ac_final.pdf')
+saveas(h_final,strcat(HOME,'fevals_final.pdf'))
+saveas(h_final,strcat(HOME,'fevals_final.pdf'))

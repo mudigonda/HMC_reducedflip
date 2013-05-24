@@ -36,7 +36,7 @@ end
 %Model Name
 
 FEVAL_MAX = 5000000
-% modelname='2dCircle100'
+% modelname='100dCircle100'
 modelname='100dMOG'
 Nsamp = 1000;
 opts_init.BatchSize = 100;
@@ -46,9 +46,9 @@ savestr = strcat('ModelName-',modelname,'-LeapSize-',int2str(opts_init.LeapSize)
     ,'-fevals-',int2str(FEVAL_MAX),'-Nsamp-',int2str(Nsamp)...
     ,'-BS-',int2str(opts_init.BatchSize),'-DS-',int2str(opts_init.DataSize));
 
-savepath = strcat(HOME,'/Data/HMC_reducedflip/2d/',savestr);
-figpath1 = strcat(HOME,'/Data/HMC_reducedflip/2d/figures/',savestr,'autocor');
-figpath2 = strcat(HOME,'/Data/HMC_reducedflip/2d/figures/',savestr,'autocor-fevals');
+savepath = strcat(HOME,'/Data/HMC_reducedflip/100d/',savestr);
+figpath1 = strcat(HOME,'/Data/HMC_reducedflip/100d/figures/',savestr,'autocor');
+figpath2 = strcat(HOME,'/Data/HMC_reducedflip/100d/figures/',savestr,'autocor-fevals');
 
 
 opts_init.funcevals = 0;
