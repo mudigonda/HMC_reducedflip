@@ -8,10 +8,10 @@ end
 
 %Calculate mean of all the means from the Model
 mean_of_models=zeros(size(Mu{1}));
-for ii=1:size(Mu,1)
+for ii=1:size(Mu,2)
    mean_of_models=mean_of_models+Mu{ii};
 end
-mean_of_models=mean(mean_of_models);
+mean_of_models= mean_of_models./size(Mu,2);
 
 %Mean subtract the Samples
 Samples=bsxfun(@minus,Samples,mean_of_models);
@@ -24,8 +24,8 @@ for ii = 0:acn
     end
 end
 
-%Normalize by the first window value
-autocorr = autocorr./repmat(autocorr(:,1),1,acn+1);
+% %Normalize by the first window value
+% autocorr = autocorr./repmat(autocorr(:,1),1,acn+1);
 autocorr = mean(autocorr(:,1:(end-1)),1);
 
 end

@@ -37,19 +37,19 @@ end
 
 FEVAL_MAX = 5000000
 % modelname='100dCircle100'
-MOG=5
+MOG=2 %Number of Gaussians in the mixture
 modelname='2dMOG-5-unitcov-shiftedmean'
 Nsamp = 1000;
 opts_init.BatchSize = 100;
-opts_init.DataSize = 10;
+opts_init.DataSize = 2;
 savestr = strcat('ModelName-',modelname,'-LeapSize-',int2str(opts_init.LeapSize),...
     '-epsilon-',int2str(opts_init.epsilon*10),'-Beta-',int2str(opts_init.beta*100)...
     ,'-fevals-',int2str(FEVAL_MAX),'-Nsamp-',int2str(Nsamp)...
     ,'-BS-',int2str(opts_init.BatchSize),'-DS-',int2str(opts_init.DataSize));
 
-savepath = strcat(HOME,'/Data/HMC_reducedflip/10dMOG/',savestr);
-figpath1 = strcat(HOME,'/Data/HMC_reducedflip/10dMOG/figures/',savestr,'autocor');
-figpath2 = strcat(HOME,'/Data/HMC_reducedflip/10dMOG/figures/',savestr,'autocor-fevals');
+savepath = strcat(HOME,'/Data/HMC_reducedflip/2dMOG/',savestr);
+figpath1 = strcat(HOME,'/Data/HMC_reducedflip/2dMOG/figures/',savestr,'autocor');
+figpath2 = strcat(HOME,'/Data/HMC_reducedflip/2dMOG/figures/',savestr,'autocor-fevals');
 
 
 opts_init.funcevals = 0;
@@ -57,15 +57,18 @@ opts_init.funcevals = 0;
 % scaling factor for energy function
 % theta = [1,0;0,1e-6];
 % % theta = 100; %%circle
-%%for ii=1:opts_init.DataSize
-%%   rng(ii);
-%%   J{ii}=diag(exp(linspace(log(1e-6), log(1), opts_init.DataSize)).*rand(1,opts_init.DataSize));
-%%   Mu{ii}=randn(opts_init.DataSize,1)*(rand(1));
-%%end
+% % for ii=1:opts_init.DataSize
+% %   rng(ii);
+% %   J{ii}=diag(exp(linspace(log(1e-6), log(1), opts_init.DataSize)).*rand(1,opts_init.DataSize));
+% %   Mu{ii}=randn(opts_init.DataSize,1)*(rand(1));
+% % end
+% % 
+
+x=4;b=-6;
 
 for ii=1:MOG
    J{ii}=diag(ones(opts_init.DataSize,1));%Unit covariances
-   Mu{ii}=repmat([0 + (ii-1)*2],opts_init.DataSize,1);%Means
+   Mu{ii}=[0;b + (ii)*x];%Means
 end
 
 
