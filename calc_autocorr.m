@@ -15,7 +15,7 @@ for ii = 0:acn
 end
 
 %Normalize by the first window value
-autocorr = autocorr./repmat(autocorr(:,1),1,acn+1);
+% autocorr = autocorr./repmat(autocorr(:,1),1,acn+1);
 autocorr = mean(autocorr(:,1:(end-1)),1);
 
 end

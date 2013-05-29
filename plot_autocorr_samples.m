@@ -1,4 +1,4 @@
-function [h_scaled,h_notscaled] = plot_autocorr_samples(X, names,avg_fevals,Mu)
+function [h_scaled,h_notscaled,ac] = plot_autocorr_samples(X, names,avg_fevals,Mu)
 colorlist=['r','g','b','k','m','y'];
 h_scaled=figure(222);
 clf();
