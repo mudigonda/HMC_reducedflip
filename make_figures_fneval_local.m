@@ -8,11 +8,11 @@ opts_init = [];
 % the energy function and gradient for the circle distribution in the arXiv
 % TODO: I think I should have used a very long narrow Gaussian instead!
 % opts_init.E = @E_gauss;
-% opts_init.E = @E_gaussMixture;
-opts_init.E = @E_student;
+opts_init.E = @E_gaussMixture;
+%opts_init.E = @E_student;
 % opts_init.dEdX = @dEdX_gauss;
-% opts_init.dEdX= @dEdX_gaussMixture;
-opts_init.dEdX = @dEdX_student;
+opts_init.dEdX= @dEdX_gaussMixture;
+%opts_init.dEdX = @dEdX_student;
 % make this 1 for more output
 opts_init.Debug = 0;
 % step size for HMC
@@ -39,19 +39,19 @@ end
 
 FEVAL_MAX = 5000000
 % modelname='100dCircle100'
-MOG=2 %Number of Gaussians in the mixture
-modelname='10d-Students'
+MOG=20 %Number of Gaussians in the mixture
+modelname='10D-MOG-20-'
 Nsamp = 1000;
 opts_init.BatchSize = 100;
-opts_init.DataSize = 10;
+opts_init.DataSize = 10; 
 savestr = strcat('ModelName-',modelname,'-LeapSize-',int2str(opts_init.LeapSize),...
     '-epsilon-',int2str(opts_init.epsilon*10),'-Beta-',int2str(opts_init.beta*100)...
     ,'-fevals-',int2str(FEVAL_MAX),'-Nsamp-',int2str(Nsamp)...
     ,'-BS-',int2str(opts_init.BatchSize),'-DS-',int2str(opts_init.DataSize));
 
-savepath = strcat(HOME,'/Data/HMC_reducedflip/10dstudent/',savestr);
-figpath1 = strcat(HOME,'/Data/HMC_reducedflip/10dstudent/figures/',savestr,'autocor');
-figpath2 = strcat(HOME,'/Data/HMC_reducedflip/10dstudent/figures/',savestr,'autocor-fevals');
+savepath = strcat(HOME,'/Data/HMC_reducedflip/10d-MOG-20/',savestr);
+figpath1 = strcat(HOME,'/Data/HMC_reducedflip/10d-MOG-20/figures/',savestr,'autocor');
+figpath2 = strcat(HOME,'/Data/HMC_reducedflip/10d-MOG-20/figures/',savestr,'autocor-fevals');
 
 
 opts_init.funcevals = 0;
@@ -60,24 +60,26 @@ opts_init.funcevals = 0;
 % theta = [1,0;0,1e-6];
 % % theta = 100; %%circle
 %%Crazy ass MOG with crazy ass everything
-% % for ii=1:opts_init.DataSize
-% %   rng(ii);
-% %   J{ii}=diag(exp(linspace(log(1e-6), log(1), opts_init.DataSize)).*rand(1,opts_init.DataSize));
+ x=4;b=-6;
+ for ii=1:opts_init.DataSize
+   rng(ii);
+   J{ii}=diag(exp(linspace(log(1e-6), log(1), opts_init.DataSize)).*rand(1,opts_init.DataSize));
+   Mu{ii} = [zeros(opts_init.DataSize-1,1);b+(ii)*x];
 % %   Mu{ii}=randn(opts_init.DataSize,1)*(rand(1));
-% % end
+ end
 % % 
 
-%%2D MOG with 2 mixtures
-% % x=4;b=-6;
-% % 
-% % for ii=1:MOG
-% %    J{ii}=diag(ones(opts_init.DataSize,1));%Unit covariances
-% %    Mu{ii}=[0;b + (ii)*x];%Means
-% % end
+%%2D MOG with n mixtures
+% x=4;b=-6;
+ 
+% for ii=1:MOG
+%    J{ii}=diag(ones(opts_init.DataSize,1));%Unit covariances
+%    Mu{ii}=[0;b + (ii)*x];%Means
+% end
 
-logalpha = zeros(opts_init.DataSize,1);
-W = eye(opts_init.DataSize);
-theta = [W, logalpha];
+%logalpha = zeros(opts_init.DataSize,1);
+%W = eye(opts_init.DataSize);
+%theta = [W, logalpha];
 
 
 %Initalize Options
@@ -132,7 +134,7 @@ ii=1;
         for jj = 1:length(names)
             tic()
                 if ii == 1 || states{jj}.funcevals < FEVAL_MAX 
-                    [Xloc, statesloc] = rf2vHMC( opts{jj}, states{jj}, theta );
+                    [Xloc, statesloc] = rf2vHMC( opts{jj}, states{jj},J,Mu);
                     states{jj} = statesloc
                     if ii > 1                                        
                         X{jj} = cat(3,X{jj}, Xloc);
