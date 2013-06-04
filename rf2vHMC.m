@@ -120,7 +120,23 @@ function [X, state] = rf2vHMC( opts, state, varargin )
                     %state.V1(:,flip_ind) = -state.V1(:,flip_ind);
                     state.steps.flip = state.steps.flip + sum(flip_ind);
                     state.steps.stay = state.steps.stay + sum(~flip_ind) - sum(gd);
-                    
+                case 3
+                    % n steps
+                    state_ladder = {};
+                    bd_lad = bd;
+                    state_ladder{1} = state;
+                    state_ladder{2} = L_state;
+                    for nn = 3:10
+                        state_ladder{nn} = leap_HMC(state_ladder{nn-1}, bd_lad, flip_on_rej);
+                        ~,~,p_cum = leap_prob_recurse(state_ladder{1:nn});
+                        jump_ind = (rnd_cmp < p_cum) & bd_lad;
+                        state = update_state(state,state_ladder{nn},jump_ind,flip_on_rej);
+                        bd_lad = bd_lad & ~jump_ind;
+                    end
+                    % and if there are any left, flip them
+                    if sum(bd_lad) > 0
+                        state = flip_HMC(state,bd_lad);
+                    end
                 %Jascha + Mayur - 2 momentum variable 
                 case 2
                     %we now have to calculate the 16 different probabilities
@@ -395,6 +411,30 @@ else
 end
 %negate the energy so you can just exponentiate directly
 potential = -potential;
+end
+
+function [prob, resid, cumu] = leap_prob_recurse(state_ladder)
+    % returns [prob making this transition], [residual probability], [cumulative probability of any transition]
+
+    if len(state_ladder) == 2
+        prob = leap_prob( start_state, leap_state, 3 );
+        cumu = prob;
+        resid = 1 - prob;
+        return;
+    end
+
+    ~, residual_forward, cumulative_forward = leap_prob_recurse(state{1:end-1});
+    if residual_forward = 0
+        prob = 0;
+        cumu = 1;
+        resid = 0;
+        return;
+    end
+    ~, residual_reverse, cumulative_reverse = leap_prob_recurse(state{end:-1:2});
+
+    prob = min([residual_forward, residual_reverse]);
+    cumu = cumulative_forward + prob;
+    resid = 1 - cumu;    
 end
 
 %
