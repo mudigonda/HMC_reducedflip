@@ -128,7 +128,7 @@ function [X, state] = rf2vHMC( opts, state, varargin )
                     state_ladder{2} = L_state;
                     for nn = 3:10
                         state_ladder{nn} = leap_HMC(state_ladder{nn-1}, bd_lad, flip_on_rej);
-                        ~,~,p_cum = leap_prob_recurse(state_ladder{1:nn});
+                        [~,~,p_cum] = leap_prob_recurse(state_ladder{1:nn});
                         jump_ind = (rnd_cmp < p_cum) & bd_lad;
                         state = update_state(state,state_ladder{nn},jump_ind,flip_on_rej);
                         bd_lad = bd_lad & ~jump_ind;
@@ -423,14 +423,14 @@ function [prob, resid, cumu] = leap_prob_recurse(state_ladder)
         return;
     end
 
-    ~, residual_forward, cumulative_forward = leap_prob_recurse(state{1:end-1});
-    if residual_forward = 0
+    [~, residual_forward, cumulative_forward] = leap_prob_recurse(state{1:end-1});
+    if residual_forward == 0
         prob = 0;
         cumu = 1;
         resid = 0;
         return;
     end
-    ~, residual_reverse, cumulative_reverse = leap_prob_recurse(state{end:-1:2});
+    [~, residual_reverse, cumulative_reverse] = leap_prob_recurse(state{end:-1:2});
 
     prob = min([residual_forward, residual_reverse]);
     cumu = cumulative_forward + prob;
