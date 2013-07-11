@@ -109,7 +109,7 @@ function [X, state] = rf2vHMC( opts, state, varargin )
                     state.steps.flip = state.steps.flip + sum(bd);
                 %Jascha - reduced flipping
                 case 1
-                    %run the 
+                    %run the leaps
                     F_state = flip_HMC(state,bd);
                     LF_state = leap_HMC(F_state,bd,opts,varargin{:});
                     r_LF = leap_prob(F_state,LF_state,flip_on_rej);
@@ -124,10 +124,10 @@ function [X, state] = rf2vHMC( opts, state, varargin )
                     % n steps
                     state_ladder = {};
                     bd_lad = bd;
-                    state_ladder{1} = state;
-                    state_ladder{2} = L_state;
-                    for nn = 3:10
-                        state_ladder{nn} = leap_HMC(state_ladder{nn-1}, bd_lad, flip_on_rej);
+                    state_ladder{1} = state; % Present State
+                    state_ladder{2} = L_state; % Leap State
+                    for nn = 3:10 % Evaluating How far we can leap
+                        state_ladder{nn} = leap_HMC(state_ladder{nn-1}, bd_lad, opts, flip_on_rej);
                         [~,~,p_cum] = leap_prob_recurse(state_ladder{1:nn});
                         jump_ind = (rnd_cmp < p_cum) & bd_lad;
                         state = update_state(state,state_ladder{nn},jump_ind,flip_on_rej);
@@ -413,16 +413,17 @@ end
 potential = -potential;
 end
 
-function [prob, resid, cumu] = leap_prob_recurse(state_ladder)
+function [prob, resid, cumu] = leap_prob_recurse(varargin)
     % returns [prob making this transition], [residual probability], [cumulative probability of any transition]
-
-    if len(state_ladder) == 2
-        prob = leap_prob( start_state, leap_state, 3 );
-        cumu = prob;
-        resid = 1 - prob;
-        return;
-    end
-
+     state = varargin;
+% %     if len(state_ladder) == 2
+% %         prob = leap_prob( start_state, leap_state, flip_on_rej );
+% %         cumu = prob;
+% %         resid = 1 - prob;
+% %         return;
+% %     end
+% %    
+    
     [~, residual_forward, cumulative_forward] = leap_prob_recurse(state{1:end-1});
     if residual_forward == 0
         prob = 0;

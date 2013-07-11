@@ -1,6 +1,6 @@
 function [h_scaled,h_notscaled,ac] = plot_autocorr_samples(X, names,avg_fevals,Mu)
 colorlist=['r','g','b','k','m','y'];
-h_scaled=figure(222);
+h_notscaled=figure(222);
 clf();
 acn=500; %The number of windows we are looking at, stick to 500 samples as default
 for ii=1:length(X)
@@ -17,7 +17,7 @@ legend(names);
 xlabel('Auto correlation windows');
 ylabel('Auto correlation values');
 
-h_notscaled=figure(333);
+h_scaled=figure(333);
 clf();
 
 for ii=1:length(X)
@@ -27,6 +27,5 @@ end
 legend(names);
 xlabel('Auto correlation windows scaled by avg fevals');
 ylabel('Auto correlation values');
-
 
 end
