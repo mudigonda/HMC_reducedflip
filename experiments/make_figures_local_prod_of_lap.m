@@ -35,7 +35,7 @@ end
 
 FEVAL_MAX = 5000000
 % modelname='100dCircle100'
-modelname='10D-Laplace-20-'
+modelname='10D-Laplace-'
 Nsamp = 1000;
 opts_init.BatchSize = 100;
 opts_init.DataSize = 10; 

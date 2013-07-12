@@ -1,4 +1,4 @@
-function E = E_gauss( X, J, mu )
+function E = E_gaussMixture( X, J, mu )
 % return the energy for each sample (column vector) in X for a Gaussian with
 % inverse covariance matrix (coupling matrix) J
    

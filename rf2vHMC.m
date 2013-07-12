@@ -416,13 +416,13 @@ end
 function [prob, resid, cumu] = leap_prob_recurse(varargin)
     % returns [prob making this transition], [residual probability], [cumulative probability of any transition]
      state = varargin;
-% %     if len(state_ladder) == 2
-% %         prob = leap_prob( start_state, leap_state, flip_on_rej );
-% %         cumu = prob;
-% %         resid = 1 - prob;
-% %         return;
-% %     end
-% %    
+    if size(state,2) == 2
+        prob = leap_prob( state{1}, state{2}, 3 );
+        cumu = prob;
+        resid = 1 - prob;
+        return;
+    end
+   
     
     [~, residual_forward, cumulative_forward] = leap_prob_recurse(state{1:end-1});
     if residual_forward == 0
