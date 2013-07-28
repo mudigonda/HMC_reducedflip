@@ -114,6 +114,16 @@ states{ii} = [];
 X{ii} = zeros(opts{ii}.DataSize,Nsamp);
 fevals{ii} = []
 
+ii = ii + 1
+names{ii} = 'forever forward'
+opts{ii} = opts_init;
+opts{ii}.FlipOnReject = 3;
+%Initialize States
+states{ii} = [];
+% arrays to keep track of the samples
+X{ii} = zeros(opts{ii}.DataSize,Nsamp);
+fevals{ii} = []
+
 if 0
 ii = ii + 1
 names{ii} = 'two momentum'
@@ -135,7 +145,7 @@ ii=1;
             tic()
                 if ii == 1 || states{jj}.funcevals < FEVAL_MAX 
                     [Xloc, statesloc] = rf2vHMC( opts{jj}, states{jj},J,Mu);
-                    states{jj} = statesloc
+                    states{jj} = statesloc;
                     if ii > 1                                        
                         X{jj} = cat(3,X{jj}, Xloc);
                     else

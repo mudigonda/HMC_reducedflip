@@ -18,7 +18,7 @@ function [X, state] = rf2vHMC( opts, state, varargin )
     epsilon = getField( opts, 'epsilon', 0.1 );
     beta = 1 - exp( log( dut ) * epsilon );    
     beta = getField( opts, 'beta', beta);
-    sprintf('Value of Beta is %f',beta)				
+    fprintf('Value of Beta is %f',beta);
     % DEBUG
     %beta = 0.03;
     %beta
@@ -127,7 +127,7 @@ function [X, state] = rf2vHMC( opts, state, varargin )
                     state_ladder{1} = state; % Present State
                     state_ladder{2} = L_state; % Leap State
                     for nn = 3:10 % Evaluating How far we can leap
-                        state_ladder{nn} = leap_HMC(state_ladder{nn-1}, bd_lad, opts, flip_on_rej);
+                        state_ladder{nn} = leap_HMC(state_ladder{nn-1}, bd_lad, opts, varargin{:});
                         [~,~,p_cum] = leap_prob_recurse(state_ladder{1:nn});
                         jump_ind = (rnd_cmp < p_cum) & bd_lad;
                         state = update_state(state,state_ladder{nn},jump_ind,flip_on_rej);
