@@ -7,17 +7,17 @@ close all;
 opts_init = [];
 % the energy function and gradient for the circle distribution in the arXiv
 % TODO: I think I should have used a very long narrow Gaussian instead!
-% opts_init.E = @E_gauss;
-opts_init.E = @E_gaussMixture;
-%opts_init.E = @E_student;
-% opts_init.dEdX = @dEdX_gauss;
-opts_init.dEdX= @dEdX_gaussMixture;
-%opts_init.dEdX = @dEdX_student;
+% opts_init.E = @E_circle;
+opts_init.E = @E_gauss;
+% opts_init.dEdX = @dEdX_circle;
+opts_init.dEdX = @dEdX_gauss;
+
+
 % make this 1 for more output
 opts_init.Debug = 0;
 % step size for HMC
 if nargin<1
-    opts_init.LeapSize = 50;
+    opts_init.LeapSize = 10;
 else
     LeapSize=str2num(LeapSize);
     opts_init.LeapSize = LeapSize
@@ -52,6 +52,9 @@ savestr = strcat('ModelName-',modelname,'-LeapSize-',int2str(opts_init.LeapSize)
 savepath = strcat(HOME,'/Data/HMC_reducedflip/10d-MOG-20/',savestr);
 figpath1 = strcat(HOME,'/Data/HMC_reducedflip/10d-MOG-20/figures/',savestr,'autocor');
 figpath2 = strcat(HOME,'/Data/HMC_reducedflip/10d-MOG-20/figures/',savestr,'autocor-fevals');
+mkdir(savepath);
+mkdir(figpath1);
+mkdir(figpath2);
 
 
 opts_init.funcevals = 0;
@@ -80,6 +83,7 @@ opts_init.funcevals = 0;
 %logalpha = zeros(opts_init.DataSize,1);
 %W = eye(opts_init.DataSize);
 %theta = [W, logalpha];
+theta = diag(exp(linspace(log(1e-6), log(1), opts_init.DataSize)));
 
 
 %Initalize Options
@@ -142,9 +146,8 @@ ii=1;
     % call the sampling algorithm Nsamp times
     while (ii <=Nsamp && RUN_FLAG == 1)
         for jj = 1:length(names)
-            tic()
                 if ii == 1 || states{jj}.funcevals < FEVAL_MAX 
-                    [Xloc, statesloc] = rf2vHMC( opts{jj}, states{jj},J,Mu);
+                    [Xloc, statesloc] = rf2vHMC( opts{jj}, states{jj},theta);
                     states{jj} = statesloc;
                     if ii > 1                                        
                         X{jj} = cat(3,X{jj}, Xloc);
@@ -154,18 +157,23 @@ ii=1;
                     
                     fevals{jj}(ii,1) = states{jj}.funcevals;
                     assert(opts_init.BatchSize == size(Xloc,2));
-%                     lle{jj}=calculate_lle(Xloc,J,Mu);
-%                     fevals{jj}(ii,2) = calc_samples_err(X{jj},J, Mu);
                 else
                     RUN_FLAG = 0;
                     break;
                 end
-            toc()
         end
-        
+
         %Display + Saving 
         if (mod( ii, 100 ) == 0) || (ii == Nsamp) || RUN_FLAG == 0
             fprintf('%d / %d in %f sec (%f sec remaining)\n', ii, Nsamp, toc(ttt), toc(ttt)*Nsamp/ii - toc(ttt) );
+
+            for jj = 1:length(names)
+                disp(names{jj})
+                states{jj}
+                states{jj}.steps
+            end
+
+
             %Calculate average fevals by taking total fevals at this point
             %and dividing it by the number of samples we have acquired
             sprintf('calculating average fevals')
