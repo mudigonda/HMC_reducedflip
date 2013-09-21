@@ -13,6 +13,8 @@ function [X, state] = rf2vHMC( opts, state, varargin )
     f_E = getField( opts, 'E', 0 );
     f_dEdX = getField( opts, 'dEdX', 0 );
         
+    max_leaps = getField( opts, 'MaxLeaps', 10);
+
     dut = 0.5; % fraction of the momentum to be replaced per unit time
     %dut = 0;
     epsilon = getField( opts, 'epsilon', 0.1 );
@@ -41,8 +43,11 @@ function [X, state] = rf2vHMC( opts, state, varargin )
         %reset(RandStream.getDefaultStream);
         %Scaling the initializations to be from interest distr
         %Not doing this for circle
-%         state.X = sqrtm(inv(varargin{:}))*randn( szd, szb ); 
-        state.X = randn( szd, szb ); 
+        % DEBUG
+        %state.X = sqrtm(inv(varargin{:}))*randn( szd, szb );
+        state.X = randn( szd, szb );
+        state.X = getField( opts, 'Xinit', state.X );
+
         state.V1 = randn( szd, szb );
         if flip_on_rej == 2
              state.V2 = randn(szd,szb);
@@ -51,7 +56,7 @@ function [X, state] = rf2vHMC( opts, state, varargin )
         %state.X(1,:) = 1;% ditto above
         % state.steps provides counters for each kind of transition
         state.steps = [];
-        state.steps.leap = 0;
+        state.steps.leap = zeros(max_leaps,1);
         state.steps.flip = 0;
         state.steps.stay = 0;
         state.steps.total = 0;
@@ -93,7 +98,7 @@ function [X, state] = rf2vHMC( opts, state, varargin )
         % TODO this will only work for batch size 1
         if sum(gd) > 0
             state = update_state(state,L_state,gd,flip_on_rej);
-            state.steps.leap = state.steps.leap + sum(gd);
+            state.steps.leap(1) = state.steps.leap(1) + sum(gd);
         end
         % bd indexes the samples for which the forward transition was rejected
         bd = rnd_cmp > r_L;
@@ -126,16 +131,21 @@ function [X, state] = rf2vHMC( opts, state, varargin )
                     bd_lad = bd;
                     state_ladder{1} = state; % Present State
                     state_ladder{2} = L_state; % Leap State
-                    for nn = 3:6 % Evaluating How far we can leap
+                    for nn = 3:max_leaps % Evaluating How far we can leap
                         state_ladder{nn} = leap_HMC(state_ladder{nn-1}, bd_lad, opts, varargin{:});
                         [~,~,p_cum] = leap_prob_recurse(state_ladder{1:nn});
                         jump_ind = (rnd_cmp < p_cum) & bd_lad;
                         state = update_state(state,state_ladder{nn},jump_ind,flip_on_rej);
                         bd_lad = bd_lad & ~jump_ind;
+                        state.steps.leap(nn-1) = state.steps.leap(nn-1) + sum(jump_ind);
+                        if sum(bd_lad) == 0
+                            break
+                        end
                     end
                     % and if there are any left, flip them
                     if sum(bd_lad) > 0
                         state = flip_HMC(state,bd_lad);
+                        state.steps.flip = state.steps.flip + sum(bd_lad);
                     end
                 %Jascha + Mayur - 2 momentum variable 
                 case 2
@@ -422,18 +432,11 @@ function [prob, resid, cumu] = leap_prob_recurse(varargin)
         resid = 1 - prob;
         return;
     end
-   
-    
+       
     [~, residual_forward, cumulative_forward] = leap_prob_recurse(state{1:end-1});
-    if residual_forward == 0
-        prob = 0;
-        cumu = 1;
-        resid = 0;
-        return;
-    end
     [~, residual_reverse, cumulative_reverse] = leap_prob_recurse(state{end:-1:2});
 
-    prob = min([residual_forward, residual_reverse]);
+    prob = min([residual_forward; residual_reverse], [], 1);
     cumu = cumulative_forward + prob;
     resid = 1 - cumu;    
 end

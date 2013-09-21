@@ -41,9 +41,10 @@ FEVAL_MAX = 5000000
 % modelname='100dCircle100'
 MOG=20 %Number of Gaussians in the mixture
 modelname='10D-MOG-20-'
-Nsamp = 1000;
+Nsamp = 10000;
 opts_init.BatchSize = 100;
-opts_init.DataSize = 10; 
+opts_init.DataSize = 10;
+opts_init.DataSize = 2;
 savestr = strcat('ModelName-',modelname,'-LeapSize-',int2str(opts_init.LeapSize),...
     '-epsilon-',int2str(opts_init.epsilon*10),'-Beta-',int2str(opts_init.beta*100)...
     ,'-fevals-',int2str(FEVAL_MAX),'-Nsamp-',int2str(Nsamp)...
@@ -83,8 +84,10 @@ opts_init.funcevals = 0;
 %logalpha = zeros(opts_init.DataSize,1);
 %W = eye(opts_init.DataSize);
 %theta = [W, logalpha];
-theta = diag(exp(linspace(log(1e-6), log(1), opts_init.DataSize)));
+%theta = diag(exp(linspace(log(1e-6), log(1), opts_init.DataSize)));
+theta = diag(exp(linspace(log(1e-5), log(1), opts_init.DataSize)));
 
+opts_init.Xinit = sqrtm(inv(theta))*randn( opts_init.DataSize, opts_init.BatchSize );
 
 %Initalize Options
 ii = 1
@@ -164,13 +167,14 @@ ii=1;
         end
 
         %Display + Saving 
-        if (mod( ii, 100 ) == 0) || (ii == Nsamp) || RUN_FLAG == 0
+        if (mod( ii, 500 ) == 0) || (ii == Nsamp) || RUN_FLAG == 0
             fprintf('%d / %d in %f sec (%f sec remaining)\n', ii, Nsamp, toc(ttt), toc(ttt)*Nsamp/ii - toc(ttt) );
 
             for jj = 1:length(names)
                 disp(names{jj})
                 states{jj}
                 states{jj}.steps
+                states{jj}.steps.leap'
             end
 
 
