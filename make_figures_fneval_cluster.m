@@ -3,6 +3,7 @@ function make_figures_fneval_cluster(LeapSize,epsilon,beta)
 whos
 clc;
 close all;
+HOME=getenv('SCRATCH')
 opts_init = [];
 % the energy function and gradient for the circle distribution in the arXiv
 % TODO: I think I should have used a very long narrow Gaussian instead!
@@ -33,24 +34,27 @@ else
 end            
 
 %Model Name
-modelname='100dGausSkew10-6'
-FEVAL_MAX = 10000000
-savestr = strcat('ModelName-',modelname,'-LeapSize-',int2str(opts_init.LeapSize),'-epsilon-',int2str(opts_init.epsilon*10),'-Beta-',int2str(opts_init.beta*100),'-fevals-',int2str(FEVAL_MAX));
-savepath = strcat('/clusterfs/cortex/scratch/mayur/HMC_reducedflip/2d/',savestr);
-figpath1 = strcat('/clusterfs/cortex/scratch/mayur/HMC_reducedflip/2d/figures/',savestr,'autocor');
-figpath2 = strcat('/clusterfs/cortex/scratch/mayur/HMC_reducedflip/2d/figures/',savestr,'fneval');
-% number of times to call the sampler
-Nsamp = 6000;
-% number of sampling stpdf to take in each sampler call
-% 			opts_init.T = 1;
-opts_init.BatchSize = 500;
-% number of data dimensions
-opts_init.DataSize = 100;
-opts_init.funcevals = 0
 
-% scaling factor for energy function
-%theta = [1,0;0,1e-6];
-theta = diag(exp(linspace(log(1e-6), log(1), 100)));
+FEVAL_MAX = 6000000
+modelname='2D'
+Nsamp = 10000;
+opts_init.BatchSize = 100;
+opts_init.DataSize = 2;
+savestr = strcat('ModelName-',modelname,'-LeapSize-',int2str(opts_init.LeapSize),...
+    '-epsilon-',int2str(opts_init.epsilon*10),'-Beta-',int2str(opts_init.beta*100)...
+    ,'-fevals-',int2str(FEVAL_MAX),'-Nsamp-',int2str(Nsamp)...
+    ,'-BS-',int2str(opts_init.BatchSize),'-DS-',int2str(opts_init.DataSize));
+
+mkdir(strcat(HOME,'/HMC_reducedflip/',modelname))
+mkdir(strcat(HOME,'/HMC_reducedflip/',modelname,'/figures'))
+savepath = strcat(HOME,'/HMC_reducedflip/',modelname,'/',savestr);
+figpath1 = strcat(HOME,'/HMC_reducedflip/',modelname,'/figures/','autocor');
+figpath2 = strcat(HOME,'/HMC_reducedflip/',modelname,'/figures/','autocor-fevals');
+
+
+%Initalize Options
+theta = diag(exp(linspace(log(1e-5), log(1), opts_init.DataSize)));
+opts_init.Xinit = sqrtm(inv(theta))*randn( opts_init.DataSize, opts_init.BatchSize );
 
 %Initalize Options
 ii = 1
@@ -84,6 +88,27 @@ states{ii} = [];
 X{ii} = zeros(opts{ii}.DataSize,Nsamp);
 fevals{ii} = []
 
+ii = ii + 1
+names{ii} = 'forever forward'
+opts{ii} = opts_init;
+opts{ii}.FlipOnReject = 3;
+%Initialize States
+states{ii} = [];
+% arrays to keep track of the samples
+X{ii} = zeros(opts{ii}.DataSize,Nsamp);
+fevals{ii} = []
+
+ii = ii + 1
+names{ii} = 'default + ff'
+opts{ii} = opts_init;
+opts{ii}.FlipOnReject = 3;
+opts{ii}.beta = 1;
+%Initialize States
+states{ii} = [];
+%arrays to keep track of samples
+X{ii} = zeros(opts{ii}.DataSize,Nsamp);
+fevals{ii} = []
+
 if 0
 ii = ii + 1
 names{ii} = 'two momentum'
@@ -96,43 +121,42 @@ X{ii} = zeros(opts{ii}.DataSize,Nsamp);
 fevals{ii} = []
 end
 ii=1;
+
 RUN_FLAG=1
 ttt = tic();
     % call the sampling algorithm Nsamp times
-			while( ii<=Nsamp && RUN_FLAG== 1)
-        for jj = 1:length(names)
-            tic()
-                if ii == 1 || states{jj}.funcevals < FEVAL_MAX 
-                    [Xloc, statesloc] = rf2vHMC( opts{jj}, states{jj}, theta );
-                    states{jj} = statesloc
-                    if ii > 1                                        
-                        X{jj} = cat(3,X{jj}, Xloc);
+        while( ii<=Nsamp && RUN_FLAG== 1)
+            for jj = 1:length(names)
+                tic()
+                    if ii == 1 || states{jj}.funcevals < FEVAL_MAX 
+                        [Xloc, statesloc] = rf2vHMC( opts{jj}, states{jj}, theta );
+                        states{jj} = statesloc
+                        if ii > 1                                        
+                            X{jj} = cat(3,X{jj}, Xloc);
+                        else
+                            X{jj} = Xloc;
+                        end                    								
+                        fevals{jj}(ii,1) = states{jj}.funcevals;
+                        fevals{jj}(ii,2) = calc_samples_err(X{jj},theta);
                     else
-                        X{jj} = Xloc;
+                            RUN_FLAG=0
+                            break;
                     end
-                    
-										%states{jj}.funcevals = states{jj}.funcevals/opts_init.BatchSize;
-                    fevals{jj}(ii,1) = states{jj}.funcevals;
-                    fevals{jj}(ii,2) = calc_samples_err(X{jj},theta);
-								else
-										RUN_FLAG=0
-										break;
-								end
-            toc()
+                toc()
+            end
+
+            %Display + Saving 
+            if (mod( ii, 500 ) == 0) || (ii == Nsamp)|| RUN_FLAG==0
+                fprintf('%d / %d in %f sec (%f sec remaining)\n', ii, Nsamp, toc(ttt), toc(ttt)*Nsamp/ii - toc(ttt) );
+                h1=plot_autocorr_samples(X, names);
+                disp('Autocorr plot completed')
+                h2=plot_fevals(fevals, names);
+                disp('Fevals plot completed')
+                disp(savestr)
+                saveas(h1,figpath1,'pdf');
+                saveas(h2,figpath2,'pdf');
+                save(savepath);
+            end
+        ii = ii + 1;
         end
-        
-        %Display + Saving 
-        if (mod( ii, 500 ) == 0) || (ii == Nsamp)|| RUN_FLAG==0
-            fprintf('%d / %d in %f sec (%f sec remaining)\n', ii, Nsamp, toc(ttt), toc(ttt)*Nsamp/ii - toc(ttt) );
-            h1=plot_autocorr_samples(X, names);
-						disp('Autocorr plot completed')
-            h2=plot_fevals(fevals, names);
-						disp('Fevals plot completed')
-            disp(savestr)
-            saveas(h1,figpath1,'pdf');
-            saveas(h2,figpath2,'pdf');
-            save(savepath);
-        end
-				ii = ii + 1;
-    end
 ttt = toc(ttt);

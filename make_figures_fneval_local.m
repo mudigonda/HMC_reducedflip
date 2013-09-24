@@ -39,8 +39,7 @@ end
 
 FEVAL_MAX = 5000000
 % modelname='100dCircle100'
-MOG=20 %Number of Gaussians in the mixture
-modelname='10D-MOG-20-'
+modelname='2D'
 Nsamp = 10000;
 opts_init.BatchSize = 100;
 opts_init.DataSize = 10;
@@ -60,31 +59,31 @@ mkdir(figpath2);
 
 opts_init.funcevals = 0;
 
-% scaling factor for energy function
-% theta = [1,0;0,1e-6];
-% % theta = 100; %%circle
-%%Crazy ass MOG with crazy ass everything
- x=4;b=-6;
- for ii=1:opts_init.DataSize
-   rng(ii);
-   J{ii}=diag(exp(linspace(log(1e-6), log(1), opts_init.DataSize)).*rand(1,opts_init.DataSize));
-   Mu{ii} = [zeros(opts_init.DataSize-1,1);b+(ii)*x];
-% %   Mu{ii}=randn(opts_init.DataSize,1)*(rand(1));
- end
-% % 
+% % % % scaling factor for energy function
+% % % % theta = [1,0;0,1e-6];
+% % % % % theta = 100; %%circle
+% % % %%Crazy ass MOG with crazy ass everything
+% % %  x=4;b=-6;
+% % %  for ii=1:opts_init.DataSize
+% % %    rng(ii);
+% % %    J{ii}=diag(exp(linspace(log(1e-6), log(1), opts_init.DataSize)).*rand(1,opts_init.DataSize));
+% % %    Mu{ii} = [zeros(opts_init.DataSize-1,1);b+(ii)*x];
+% % % % %   Mu{ii}=randn(opts_init.DataSize,1)*(rand(1));
+% % %  end
+% % % % % 
 
-%%2D MOG with n mixtures
-% x=4;b=-6;
- 
-% for ii=1:MOG
-%    J{ii}=diag(ones(opts_init.DataSize,1));%Unit covariances
-%    Mu{ii}=[0;b + (ii)*x];%Means
-% end
+% % %%2D MOG with n mixtures
+% % % x=4;b=-6;
+% %  
+% % % for ii=1:MOG
+% % %    J{ii}=diag(ones(opts_init.DataSize,1));%Unit covariances
+% % %    Mu{ii}=[0;b + (ii)*x];%Means
+% % % end
 
 %logalpha = zeros(opts_init.DataSize,1);
 %W = eye(opts_init.DataSize);
 %theta = [W, logalpha];
-%theta = diag(exp(linspace(log(1e-6), log(1), opts_init.DataSize)));
+
 theta = diag(exp(linspace(log(1e-5), log(1), opts_init.DataSize)));
 
 opts_init.Xinit = sqrtm(inv(theta))*randn( opts_init.DataSize, opts_init.BatchSize );
@@ -128,6 +127,17 @@ opts{ii}.FlipOnReject = 3;
 %Initialize States
 states{ii} = [];
 % arrays to keep track of the samples
+X{ii} = zeros(opts{ii}.DataSize,Nsamp);
+fevals{ii} = []
+
+ii = ii + 1
+names{ii} = 'default + ff'
+opts{ii} = opts_init;
+opts{ii}.FlipOnReject = 3;
+opts{ii}.beta = 1;
+%Initialize States
+states{ii} = [];
+%arrays to keep track of samples
 X{ii} = zeros(opts{ii}.DataSize,Nsamp);
 fevals{ii} = []
 
