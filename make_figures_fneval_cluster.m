@@ -146,16 +146,35 @@ ttt = tic();
             end
 
             %Display + Saving 
-            if (mod( ii, 500 ) == 0) || (ii == Nsamp)|| RUN_FLAG==0
-                fprintf('%d / %d in %f sec (%f sec remaining)\n', ii, Nsamp, toc(ttt), toc(ttt)*Nsamp/ii - toc(ttt) );
-                h1=plot_autocorr_samples(X, names);
+            if (mod( ii, 500 ) == 0) || (ii == Nsamp) || RUN_FLAG == 0
+            fprintf('%d / %d in %f sec (%f sec remaining)\n', ii, Nsamp, toc(ttt), toc(ttt)*Nsamp/ii - toc(ttt) );
+
+            for jj = 1:length(names)
+                disp(names{jj})
+                states{jj}
+                states{jj}.steps
+                states{jj}.steps.leap'
+            end
+
+
+            %Calculate average fevals by taking total fevals at this point
+            %and dividing it by the number of samples we have acquired
+            sprintf('calculating average fevals')
+            for jj=1:length(names)
+                avg_fevals{jj}=fevals{jj}(end,1)/size(X{jj},3);
+            end
+            if exist('Mu','var')
+                [h1,h2]=plot_autocorr_samples(X, names,avg_fevals,Mu);
+            else
+                [h1,h2]=plot_autocorr_samples(X, names,avg_fevals);
+            end
                 disp('Autocorr plot completed')
-                h2=plot_fevals(fevals, names);
-                disp('Fevals plot completed')
-                disp(savestr)
-                saveas(h1,figpath1,'pdf');
-                saveas(h2,figpath2,'pdf');
-                save(savepath);
+%             h2=plot_fevals(fevals, names);
+						disp('Fevals plot completed')
+            disp(savestr)
+            saveas(h1,figpath1,'pdf');
+            saveas(h2,figpath2,'pdf');
+            save(savepath);
             end
         ii = ii + 1;
         end
