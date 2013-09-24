@@ -3,6 +3,8 @@ source /usr/Moudles/init/bash
 
 #SBATCH -p cortex
 #SBATCH --time=12:30:00
+#SBATCH --mem-per-cpu=1GB
+#SBATCH --ntasks-per-node=2
 
 cd /global/home/users/mayur/HMC_reducedflip/
 echo "Epsilon = ",$Epsilon

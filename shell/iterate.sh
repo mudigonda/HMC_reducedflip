@@ -6,13 +6,13 @@ param3=.5
 JobFile="param_test.sh"
 count=0
 #LeapSize
-for LeapSize in 500 1000
+for LeapSize in 1 10 50 100 
 do
 #Epsilon
 		for Epsilon in $(seq .7 .1 $param2);
 		do
 			#Beta
-			for Beta in $(seq .1 .1 $param3);
+			for Beta in $(seq .01 .1 $param3);
 			do
 				echo $LeapSize,$Epsilon,$Beta
 				Outfile=/global/home/users/mayur/Logs/HMCredflip_$LeapSize-$Epsilon-$Beta.o
