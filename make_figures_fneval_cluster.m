@@ -78,6 +78,7 @@ states{ii} = [];
 X{ii} = zeros(opts{ii}.DataSize,Nsamp);
 fevals{ii} = []
 
+if 0
 ii = ii + 1
 names{ii} = 'reduced flip'
 opts{ii} = opts_init;
@@ -87,6 +88,7 @@ states{ii} = [];
 % arrays to keep track of the samples
 X{ii} = zeros(opts{ii}.DataSize,Nsamp);
 fevals{ii} = []
+end
 
 ii = ii + 1
 names{ii} = 'forever forward'
@@ -120,6 +122,8 @@ states{ii} = [];
 X{ii} = zeros(opts{ii}.DataSize,Nsamp);
 fevals{ii} = []
 end
+
+%Since we foolishly used the same index, we are setting ii to 1
 ii=1;
 
 RUN_FLAG=1
