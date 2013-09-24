@@ -48,8 +48,8 @@ savestr = strcat('ModelName-',modelname,'-LeapSize-',int2str(opts_init.LeapSize)
 mkdir(strcat(HOME,'/HMC_reducedflip/',modelname))
 mkdir(strcat(HOME,'/HMC_reducedflip/',modelname,'/figures'))
 savepath = strcat(HOME,'/HMC_reducedflip/',modelname,'/',savestr);
-figpath1 = strcat(HOME,'/HMC_reducedflip/',modelname,'/figures/','autocor');
-figpath2 = strcat(HOME,'/HMC_reducedflip/',modelname,'/figures/','autocor-fevals');
+figpath1 = strcat(HOME,'/HMC_reducedflip/',modelname,'/figures/',savestr,'autocor');
+figpath2 = strcat(HOME,'/HMC_reducedflip/',modelname,'/figures/',savestr,'autocor-fevals');
 
 
 %Initalize Options
