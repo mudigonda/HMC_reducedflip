@@ -1,16 +1,19 @@
 function[summary_stats] = summary_stats(path)
-
+disp('changing directory')
 cd(path)
-
+disp('calculating stored mat files')
 files = dir('*.mat');
-summary_stats=zeros(length(files),9);
 
+%Init
+
+%Summarizing
 for filesidx=1:length(files)
    load(files(filesidx).name)
-   disp(filesidx)
+	 STATES=length(states);
+	 disp(filesidx)
    for sampleridx=1:length(states)
-       summary_stats(filesidx,(sampleridx-1)*3+ 1) = states{sampleridx}.steps.leap;
-       summary_stats(filesidx,(sampleridx-1)*3+ 2) = states{sampleridx}.steps.flip;
-       summary_stats(filesidx,(sampleridx-1)*3+ 3) = states{sampleridx}.steps.stay;
+       summary_stats{sampleridx}.leap(filesidx,:) = states{sampleridx}.steps.leap'; 
+			 summary_stats{sampleridx}.flip(filesidx,:) = states{sampleridx}.steps.flip;
+       summary_stats{sampleridx}.stay(filesidx,:) = states{sampleridx}.steps.stay;
    end
 end
