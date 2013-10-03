@@ -13,19 +13,17 @@ function [X, state] = rf2vHMC( opts, state, varargin )
     f_E = getField( opts, 'E', 0 );
     f_dEdX = getField( opts, 'dEdX', 0 );
         
-    max_leaps = getField( opts, 'MaxLeaps', 10);
+    %max_leaps = getField( opts, 'MaxLeaps', 10);
+    max_leaps = getField( opts, 'MaxLeaps', 5);
 
-    dut = 0.5; % fraction of the momentum to be replaced per unit time
-    %dut = 0;
     epsilon = getField( opts, 'epsilon', 0.1 );
     LeapSize = getField(opts, 'LeapSize',1);
     opts.LeapSize = LeapSize; % opts gets passed around
     opts.epsilon = epsilon;
     alpha = getField( opts, 'alpha', 0.2);
     beta = alpha^(1 / (epsilon*LeapSize));
-
-    nobeta = getField( opts, 'beta', -1);
-    assert(nobeta == -1); % make sure nowhere is using the old scheme
+    beta = getField( opts, 'beta', beta);
+    %assert(nobeta == -1); % make sure nowhere is using the old scheme
 %    fprintf('Value of Beta is %f',beta);
     % DEBUG
     %beta = 0.03;
