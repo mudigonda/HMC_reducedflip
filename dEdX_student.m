@@ -5,6 +5,8 @@
 
 function dE = dEdX_student( X, theta )%x, phi, nu )
     
+        X = [X;ones(1,size(X,2))];
+
 %    ff = phi*x;
 %    bb = 1./(1 + (ff).^2 / nu);
 %    dE = (nu+1)/2 * 2 * (phi' * (ff.*bb))/nu;
@@ -14,7 +16,7 @@ function dE = dEdX_student( X, theta )%x, phi, nu )
         nbatch = size(X, 2);
         nexperts = prod(size(theta)) / (ndims+1);
         W = reshape( theta, [nexperts, ndims+1] );
-        alpha = exp(W(:,ndims+1));
+        alpha = W(:,ndims+1);
         W = W(:, 1:ndims);
 
         ff = W * X;
@@ -23,6 +25,8 @@ function dE = dEdX_student( X, theta )%x, phi, nu )
         %        lt = diag(alpha) * (ff./off2);        
         lt = bsxfun(@times, ff./off2, alpha);        
         dE = 2 * W' * lt;
+
+        dE = dE(1:end-1,:);
 
         %        E = E_POE( theta, X ); %%% temporary for diagnostic purposes
         %figure(4);

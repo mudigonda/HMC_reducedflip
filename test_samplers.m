@@ -8,7 +8,7 @@ opts_init.dEdX = @dEdX_gauss;
 
 % make this 1 for more output
 opts_init.Debug = 0;
-opts_init.LeapSize = 10;
+opts_init.LeapSize = 1;
 opts_init.epsilon = 1.3;
 
 %Model Name
@@ -16,7 +16,7 @@ opts_init.epsilon = 1.3;
 FEVAL_MAX = 5000000
 modelname='2D'
 Nsamp = 10000;
-opts_init.BatchSize = 10000;
+opts_init.BatchSize = 1000;
 opts_init.DataSize = 2;
 opts_init.funcevals = 0;
 theta = diag(exp(linspace(log(1e-4), log(1), opts_init.DataSize)));
@@ -113,7 +113,7 @@ ii=1;
         end
 
         %Display + Saving 
-        if (mod( ii, 100 ) == 0) || (ii == Nsamp) || RUN_FLAG == 0
+        if (mod( ii, 10 ) == 0) || (ii == Nsamp) || RUN_FLAG == 0
             fprintf('%d / %d in %f sec (%f sec remaining)\n', ii, Nsamp, toc(ttt), toc(ttt)*Nsamp/ii - toc(ttt) );
 
             for jj = 1:length(names)

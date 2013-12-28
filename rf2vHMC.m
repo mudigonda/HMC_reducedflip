@@ -14,7 +14,7 @@ function [X, state] = rf2vHMC( opts, state, varargin )
     f_dEdX = getField( opts, 'dEdX', 0 );
         
     %max_leaps = getField( opts, 'MaxLeaps', 10);
-    max_leaps = getField( opts, 'MaxLeaps', 5);
+    max_leaps = getField( opts, 'MaxLeaps', 4);
 
     epsilon = getField( opts, 'epsilon', 0.1 );
     LeapSize = getField(opts, 'LeapSize',1);
@@ -25,9 +25,6 @@ function [X, state] = rf2vHMC( opts, state, varargin )
     beta = getField( opts, 'beta', beta);
     %assert(nobeta == -1); % make sure nowhere is using the old scheme
 %    fprintf('Value of Beta is %f',beta);
-    % DEBUG
-    %beta = 0.03;
-    %beta
     
     % this controls whether or not to use the reduced flip mode
     % default (0) is reduced flip mode
@@ -48,7 +45,6 @@ function [X, state] = rf2vHMC( opts, state, varargin )
         %Scaling the initializations to be from interest distr
         %Not doing this for circle
         % DEBUG
-        %state.X = sqrtm(inv(varargin{:}))*randn( szd, szb );
         state.X = randn( szd, szb );
         state.X = getField( opts, 'Xinit', state.X );
 
@@ -92,7 +88,13 @@ function [X, state] = rf2vHMC( opts, state, varargin )
             state.optim.exit(state.steps.total+1) = 0;
         end
      
+        % state.X(:,1)'
+
         L_state = leap_HMC(state,[],opts,varargin{:});
+
+        % % DEBUG
+        % L_state.X(:,1)'
+
         r_L = leap_prob(state,L_state,flip_on_rej); % this should be the same as p_lea        
         % compare against a random number to decide whether to accept
         rnd_cmp = rand(1,szb);
@@ -135,7 +137,7 @@ function [X, state] = rf2vHMC( opts, state, varargin )
                     bd_lad = bd;
                     state_ladder{1} = state; % Present State
                     state_ladder{2} = L_state; % Leap State
-                    for nn = 3:max_leaps % Evaluating How far we can leap
+                    for nn = 3:max_leaps+1 % Evaluating How far we can leap
                         state_ladder{nn} = leap_HMC(state_ladder{nn-1}, bd_lad, opts, varargin{:});
                         [~,~,p_cum] = leap_prob_recurse(state_ladder{1:nn});
                         jump_ind = (rnd_cmp < p_cum) & bd_lad;
@@ -377,6 +379,18 @@ for ii=1:LeapSize
     E1(:,ind) = f_E( X1(:,ind), varargin{:});
     V1(:,ind) = Vhalf(:,ind) - epsilon/2 * dEdX1(:,ind);
     state.V1(:,ind) = V1(:,ind);
+    % fprintf('v0 ')
+    % V0(:,1)'
+    % fprintf('v1 ')
+    % V1(:,1)'
+    % fprintf('dedx0 ')
+    % dEdX0(:,1)'
+    % fprintf('dedx1 ')
+    % dEdX1(:,1)'
+    % fprintf('x0 ')
+    % X0(:,1)'
+    % fprintf('x1 ')
+    % X1(:,1)'
     state.X(:,ind) = X1(:,ind);
     state.E(:,ind) = E1(:,ind);
     state.dEdX(:,ind) = dEdX1(:,ind);

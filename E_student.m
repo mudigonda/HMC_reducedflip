@@ -5,6 +5,8 @@
 
 function E = E_student( X, theta ) %x, phi, nu )
 
+        X = [X;ones(1,size(X,2))];
+
 %    E = (nu+1)/2 * sum(log( 1 + ((phi*x).^2)/nu  ));
     
         % product of student-t experts
@@ -12,7 +14,7 @@ function E = E_student( X, theta ) %x, phi, nu )
         nbatch = size(X, 2);
         nexperts = prod(size(theta)) / (ndims+1);
         W = reshape( theta, [nexperts, ndims+1] );
-        alpha = exp(W(:,ndims+1));
+        alpha = W(:,ndims+1);
         W = W(:, 1:ndims);
         
         ff = W * X;
