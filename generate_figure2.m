@@ -4,14 +4,14 @@ close all;
 addpath cauchy
 
 Nsamp = 10000;
-batch_size = 100;
+batch_size = 400;
 
-Nsamp = 500;
-batch_size = 50;
+% Nsamp = 500;
+% batch_size = 10;
 
 dt = datestr(now, 'yyyymmdd-HHMMSS'); % TODO -- include time of day
 
-for target_model_i = 1:1 %2:3
+for target_model_i = 1:3
 
 %% anisotropic Gaussian
 opts_init = [];
@@ -38,22 +38,23 @@ if target_model_i == 1
 
     opts_init.E = @E_rough;
     opts_init.dEdX = @dEdX_rough;
-    theta = {20, 4};
+    theta = {100, 5};
 
     
     opts_init.Xinit = randn( opts_init.DataSize, opts_init.BatchSize )*theta{1};
+    opts_init.Xinit(:) = 0;
     %% burnin the samples
     tic();
     disp('burnin');
     opts_burnin = opts_init;
     opts_burnin.Debug = 1;
-    opts_burnin.T = Nsamp;
+    opts_burnin.T = Nsamp*3;
     opts_burnin.FlipOnReject = 3;
     [Xloc, statesloc] = rf2vHMC( opts_burnin, [], theta{:});
     opts_init.Xinit = Xloc;
     toc()
 
-    max_shift = 200;
+    max_shift = 1000;
     
 elseif (target_model_i == 2) | (target_model_i == 3)
     rng('default'); % make experiments repeatable
@@ -71,73 +72,12 @@ elseif (target_model_i == 2) | (target_model_i == 3)
     opts_init.dEdX = @dEdX_gauss;
     theta = {diag(exp(linspace(log(1e-6), log(1), opts_init.DataSize)))};
     opts_init.Xinit = sqrtm(inv(theta{1}))*randn( opts_init.DataSize, opts_init.BatchSize );
-
+    
     max_shift = 7000;
-% elseif target_model_i == 6
-%     rng('default'); % make experiments repeatable
-% 
-%     opts_init.E = @E_student;
-%     opts_init.dEdX = @dEdX_student;
-%     opts_init.DataSize = 10;
-%     b = 2;
-%     W = eye(opts_init.DataSize) / b;
-%     alpha = ones(opts_init.DataSize,1)*2;
-%     zz = zeros(opts_init.DataSize,1);
-%     theta = [W, zz, alpha];
-%     %opts_init.Xinit = laprnd( opts_init.DataSize, opts_init.BatchSize, 0, sqrt(2)*b );
-%     opts_init.Xinit = cauchyrnd(0, 1, opts_init.DataSize, opts_init.BatchSize )*b;
-% 
-%     %% burnin the samples
-%     tic();
-%     disp('burnin');
-%     opts_burnin = opts_init;
-%     opts_burnin.Debug = 1;
-%     opts_burnin.T = 2000; %Nsamp; % DEBUG
-%     opts_burnin.FlipOnReject = 3;
-%     [Xloc, statesloc] = rf2vHMC( opts_burnin, [], theta);
-%     opts_init.Xinit = Xloc;
-%     toc()
-% 
-%     max_shift = 75;
-%     modelname = 'ICA';
-%     modeltitle = 'ICA Student''s t';
-% elseif target_model_i == 5
-%     rng('default'); % make experiments repeatable
-% 
-%     opts_init.E = @E_student;
-%     opts_init.dEdX = @dEdX_student;
-%     opts_init.DataSize = 100;
-%     nexperts = 2*opts_init.DataSize;
-%     scl = 5;
-%     W = randn(nexperts/2, opts_init.DataSize+1) / sqrt(opts_init.DataSize) / scl;
-%     W(:,end) = randn(nexperts/2,1);
-%     W = [W; -W];
-%     alpha = 0.5 + rand(nexperts,1);
-%     theta = [W, alpha];
-%     opts_init.Xinit = cauchyrnd(0, 1, opts_init.DataSize, opts_init.BatchSize )/scl;
-%     %opts_init.Xinit = randn( opts_init.DataSize, opts_init.BatchSize );
-% 
-%     %% burnin the samples
-%     tic();
-%     disp('burnin');
-%     opts_burnin = opts_init;
-%     opts_burnin.Debug = 1;
-%     opts_burnin.T = 5000; %Nsamp; % DEBUG
-%     opts_burnin.FlipOnReject = 3;
-%     [Xloc, statesloc] = rf2vHMC( opts_burnin, [], theta);
-%     opts_init.Xinit = Xloc;
-%     toc()
-% 
-%     max_shift = 5000;
-%     modelname = 'POT';
-%     modeltitle = 'Product of Student''s t-model';
 end
 
 basedir = strcat(modelname, '_', dt, '/');
 basedirfig = strcat(basedir, 'figures', '/');
-savepath = strcat(basedir,'alldata.mat');
-figpath1 = strcat(basedir,'autocorr-fevals.fig');
-figpath2 = strcat(basedir,'autocorr-steps.fig');
 mkdir(basedir);
 
 %Initalize Options
@@ -239,14 +179,24 @@ ii=1;
               %          disp('Fevals plot completed')
             figure(h1);
             title(modeltitle);
-            grid on
             figure(h2);
             title(modeltitle);
             grid on
             drawnow;
-            saveas(h1,figpath1,'fig');
-            saveas(h2,figpath2,'fig');
-            save(savepath);
+            fp = strcat(basedir,'autocorr-fevals.fig');
+            saveas(h1,fp);
+            fp = strcat(basedir,'autocorr-steps.fig');
+            saveas(h2,fp);
+            save(strcat(basedir,'alldata.mat'));
+
+            % use the export_fig util from https://sites.google.com/site/oliverwoodford/software/export_fig
+            fp = strcat(basedir,'autocorr-fevals.pdf');
+                export_fig( fp, h1 );
+            try
+                export_fig( fp, h1 );
+            catch err
+                fprintf( '\nExpecting export_fig\n' );
+            end
         end
         ii = ii + 1;
     end

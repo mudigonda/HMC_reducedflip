@@ -90,7 +90,9 @@ function [X, state] = rf2vHMC( opts, state, varargin )
      
         % state.X(:,1)'
 
+        %assert(max(state.E)<5); %DEBUG
         L_state = leap_HMC(state,[],opts,varargin{:});
+        %assert(max(L_state.E)<5); %DEBUG
 
         % % DEBUG
         % L_state.X(:,1)'
@@ -135,11 +137,18 @@ function [X, state] = rf2vHMC( opts, state, varargin )
                     % n steps
                     state_ladder = {};
                     bd_lad = bd;
+                    %bd_lad
                     state_ladder{1} = state; % Present State
                     state_ladder{2} = L_state; % Leap State
+                    %state_ladder{1}.E %DEBUG
+                    %state_ladder{2}.E %DEBUG
                     for nn = 3:max_leaps+1 % Evaluating How far we can leap
                         state_ladder{nn} = leap_HMC(state_ladder{nn-1}, bd_lad, opts, varargin{:});
+                        %assert(max(abs(hamiltonian_HMC(state_ladder{nn-1}, [], 3) - hamiltonian_HMC(state_ladder{nn}, [], 3)))<3);
+                        %state_ladder{nn}.E %DEBUG
                         [~,~,p_cum] = leap_prob_recurse(state_ladder{1:nn});
+                        %assert(max(p_cum.*state_ladder{nn}.E)<5); %DEBUG
+                        %p_cum
                         jump_ind = (rnd_cmp < p_cum) & bd_lad;
                         state = update_state(state,state_ladder{nn},jump_ind,flip_on_rej);
                         bd_lad = bd_lad & ~jump_ind;
@@ -153,6 +162,7 @@ function [X, state] = rf2vHMC( opts, state, varargin )
                         state = flip_HMC(state,bd_lad);
                         state.steps.flip = state.steps.flip + sum(bd_lad);
                     end
+                    %state.E
                 %Jascha + Mayur - 2 momentum variable 
                 case 2
                     %we now have to calculate the 16 different probabilities
@@ -422,7 +432,7 @@ end
 %function to evaluate hamiltonian of a state
 %%Use a buffer 
 % TODO(jascha) naming scheme -- potential to energy and/or log_probability
-function [potential] = hamiltonian_HMC(state,ind,flip_on_rej)
+function [H] = hamiltonian_HMC(state,ind,flip_on_rej)
 if isempty(ind)
     ind = 1:size(state.V1,2);
 end
@@ -432,13 +442,13 @@ if flip_on_rej ==2
     V2 = state.V2(:,ind);
 %     potential = E + (1/2) * (V1'*V1) + (1/2) * (V2'*V2);    
     %to generalize this needs to be sum(v1.*v1)
-    potential = E + (1/2) * (sum(V1.*V1)) + (1/2) * (sum(V2.*V2));
+    H = E + (1/2) * (sum(V1.*V1)) + (1/2) * (sum(V2.*V2));
 else
 %     potential = E + (1/2) * (V1'*V1);
-    potential = E + (1/2) * (sum(V1.*V1));
+    H = E + (1/2) * (sum(V1.*V1));
 end
-%negate the energy so you can just exponentiate directly
-potential = -potential;
+% %negate the energy so you can just exponentiate directly
+% potential = -potential;
 end
 
 function [prob, resid, cumu] = leap_prob_recurse(varargin)
@@ -453,8 +463,9 @@ function [prob, resid, cumu] = leap_prob_recurse(varargin)
        
     [~, residual_forward, cumulative_forward] = leap_prob_recurse(state{1:end-1});
     [~, residual_reverse, cumulative_reverse] = leap_prob_recurse(state{end:-1:2});
-
-    prob = min([residual_forward; residual_reverse], [], 1);
+    start_state_ratio = exp(hamiltonian_HMC(state{1},[],3) - hamiltonian_HMC(state{end},[],3));
+    
+    prob = min([residual_forward; residual_reverse.*start_state_ratio], [], 1);
     cumu = cumulative_forward + prob;
     resid = 1 - cumu;    
 end
@@ -462,7 +473,11 @@ end
 %
 function [prob] = leap_prob(start_state, leap_state,flip_on_rej)
 
-numerator = hamiltonian_HMC(leap_state,[],flip_on_rej);
-denominator = hamiltonian_HMC(start_state,[],flip_on_rej);
-prob = min(1,exp(numerator - denominator));
+% numerator = hamiltonian_HMC(leap_state,[],flip_on_rej);
+% denominator = hamiltonian_HMC(start_state,[],flip_on_rej);
+% prob = min(1,exp(numerator - denominator));
+H_leap = hamiltonian_HMC(leap_state,[],flip_on_rej);
+H_start = hamiltonian_HMC(start_state,[],flip_on_rej);
+prob = min(1,exp(H_start - H_leap));
+
 end

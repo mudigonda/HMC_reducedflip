@@ -1,7 +1,14 @@
 function [h_scaled,h_notscaled,ac] = plot_autocorr_samples(X, names,avg_fevals, max_shift)
+
+fig_shape = [1,1,4,3];
+
 colorlist=['r','g','b','k','m','y'];
 h_notscaled=figure(222);
 clf();
+set(h_notscaled, 'Units','inches');
+set(h_notscaled, 'Position', fig_shape);
+set(h_notscaled, 'Color', 'w');
+grid on;
 
 num_steps = 500;
 max_shift = min([max_shift, size(X{1},3)]);
@@ -23,11 +30,19 @@ ylabel('Autocorrelation');
 
 h_scaled=figure(333);
 clf();
+set(h_scaled, 'Units','inches');
+set(h_scaled, 'Position', fig_shape);
+set(h_scaled, 'Color', 'w');
+grid on;
+
+min_fevals = inf;
 
 for ii=1:length(X)
+    min_fevals = min([max(target_shifts*avg_fevals{ii}), min_fevals]);
     plot(target_shifts*avg_fevals{ii},ac{ii},colorlist(ii));
     hold on;
 end
+axis([0, min_fevals, -0.1, 1.01]);
 legend(names);
 xlabel('Gradient Evaluations');
 ylabel('Autocorrelation');
