@@ -1,8 +1,6 @@
 clear all;
 close all;
 
-addpath cauchy
-
 Nsamp = 10000;
 batch_size = 400;
 
@@ -38,11 +36,11 @@ if target_model_i == 1
 
     opts_init.E = @E_rough;
     opts_init.dEdX = @dEdX_rough;
-    theta = {100, 5};
+    theta = {100, 4};
 
     
     opts_init.Xinit = randn( opts_init.DataSize, opts_init.BatchSize )*theta{1};
-    opts_init.Xinit(:) = 0;
+    %opts_init.Xinit(:) = 0;
     %% burnin the samples
     tic();
     disp('burnin');
@@ -54,7 +52,7 @@ if target_model_i == 1
     opts_init.Xinit = Xloc;
     toc()
 
-    max_shift = 1000;
+    max_shift = 1001;
     
 elseif (target_model_i == 2) | (target_model_i == 3)
     rng('default'); % make experiments repeatable
@@ -73,7 +71,7 @@ elseif (target_model_i == 2) | (target_model_i == 3)
     theta = {diag(exp(linspace(log(1e-6), log(1), opts_init.DataSize)))};
     opts_init.Xinit = sqrtm(inv(theta{1}))*randn( opts_init.DataSize, opts_init.BatchSize );
     
-    max_shift = 7000;
+    max_shift = 7001;
 end
 
 basedir = strcat(modelname, '_', dt, '/');
@@ -148,10 +146,10 @@ ii=1;
         end
 
         %Display + Saving 
-        if (mod( ii, 100 ) == 0)
+        if (mod( ii, ceil(Nsamp/50) ) == 0)
             fprintf('%d / %d in %f sec (%f sec remaining)\r', ii, Nsamp, toc(ttt), toc(ttt)*Nsamp/ii - toc(ttt) );
         end
-        if (mod( ii, 5000 ) == 0) || (ii == Nsamp) || RUN_FLAG == 0
+        if (mod( ii, ceil(Nsamp/5) ) == 0) || (ii == Nsamp) || RUN_FLAG == 0
             fprintf('%d / %d in %f sec (%f sec remaining)\n', ii, Nsamp, toc(ttt), toc(ttt)*Nsamp/ii - toc(ttt) );
 
             for jj = 1:length(names)
@@ -191,8 +189,8 @@ ii=1;
 
             % use the export_fig util from https://sites.google.com/site/oliverwoodford/software/export_fig
             fp = strcat(basedir,'autocorr-fevals.pdf');
-                export_fig( fp, h1 );
             try
+                addpath('export_fig');
                 export_fig( fp, h1 );
             catch err
                 fprintf( '\nExpecting export_fig\n' );
