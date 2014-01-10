@@ -36,6 +36,7 @@ end
 %Model Name
 
 FEVAL_MAX = 6000000
+MAX_SHIFT = 7000
 modelname='2D'
 Nsamp = 10000;
 opts_init.BatchSize = 100;
@@ -167,10 +168,11 @@ ttt = tic();
             for jj=1:length(names)
                 avg_fevals{jj}=fevals{jj}(end,1)/size(X{jj},3);
             end
+								%This is not going to work as it seems to suggest it needs a fourth param called max_shift
             if exist('Mu','var')
-                [h1,h2]=plot_autocorr_samples(X, names,avg_fevals,Mu);
+                [h1,h2,ac]=plot_autocorr_samples(X, names,avg_fevals,Mu);
             else
-                [h1,h2]=plot_autocorr_samples(X, names,avg_fevals);
+                [h1,h2,ac]=plot_autocorr_samples(X, names,avg_fevals,MAX_SHIFT);
             end
                 disp('Autocorr plot completed')
 %             h2=plot_fevals(fevals, names);
